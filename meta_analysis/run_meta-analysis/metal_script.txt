@@ -1,0 +1,155 @@
+COLUMNCOUNTING LENIENT
+
+SCHEME STDERR
+
+MARKER   MARKERNAME
+ALLELE   EFFECT_ALLELE NON_EFFECT_ALLELE
+FREQ     EAF
+EFFECT   BETA
+STDERR   SE
+PVAL     PVAL
+WEIGHT   N
+
+AVERAGEFREQ     ON
+MINMAXFREQ      ON
+FREQLABEL       EAF
+CUSTOMVARIABLE TOTALSAMPLESIZE
+LABEL TOTALSAMPLESIZE AS N
+
+PROCESS ../clean_files_for_metaanalysis/ALSPAC_pw_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/EFSOCH_pw_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/GenR_pw_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/MoBa_pw_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/NFBC1966_child.gz
+PROCESS ../clean_files_for_metaanalysis/NFBC1986_child.gz
+PROCESS ../clean_files_for_metaanalysis/DNBC_child.gz
+PROCESS ../clean_files_for_metaanalysis/FS_child.gz
+PROCESS ../clean_files_for_metaanalysis/IHPS_CIDR_child.gz
+PROCESS ../clean_files_for_metaanalysis/IHPS_casesCtrls_MEGAex_child.gz
+PROCESS ../clean_files_for_metaanalysis/OPI_child.gz
+PROCESS ../clean_files_for_metaanalysis/INMAOmni_pw_child.gz
+PROCESS ../clean_files_for_metaanalysis/Raine_pw_child.gz
+PROCESS ../clean_files_for_metaanalysis/GS_pw_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/INMAGSA_pw_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/Roskilde_pw_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_obese_mothers_pw_child.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_obese_children_pw_child.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_control_mothers_pw_child.gz
+PROCESS ../clean_files_for_metaanalysis/iPSYCH_new_pw_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/PANIC_pw_fetal.gz
+
+OUTFILE pw_fetal_sex .tbl
+ANALYZE HETEROGENEITY
+CLEAR
+
+CUSTOMVARIABLE TOTALSAMPLESIZE
+LABEL TOTALSAMPLESIZE AS N
+
+PROCESS ../clean_files_for_metaanalysis/ALSPAC_pw_gest_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/EFSOCH_pw_gest_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/GenR_pw_gest_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/MoBa_pw_gest_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/NFBC1966_child_gest.gz
+PROCESS ../clean_files_for_metaanalysis/NFBC1986_child_gest.gz
+PROCESS ../clean_files_for_metaanalysis/DNBC_child_gest.gz
+PROCESS ../clean_files_for_metaanalysis/FS_child_gest.gz
+PROCESS ../clean_files_for_metaanalysis/IHPS_CIDR_child_gest.gz
+PROCESS ../clean_files_for_metaanalysis/IHPS_casesCtrls_MEGAex_child_gest.gz
+PROCESS ../clean_files_for_metaanalysis/OPI_child_gest.gz
+PROCESS ../clean_files_for_metaanalysis/INMAOmni_pw_gest_child.gz
+PROCESS ../clean_files_for_metaanalysis/Raine_pw_gest_child.gz
+PROCESS ../clean_files_for_metaanalysis/GS_pw_gest_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/INMAGSA_pw_gest_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/Roskilde_pw_gest_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_obese_mothers_pw_gest_child.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_obese_children_pw_gest_child.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_control_mothers_pw_gest_child.gz
+PROCESS ../clean_files_for_metaanalysis/iPSYCH_new_pw_gest_fetal.gz
+PROCESS ../clean_files_for_metaanalysis/PANIC_pw_gest_fetal.gz
+
+OUTFILE pw_fetal_sex_gest .tbl
+ANALYZE HETEROGENEITY
+CLEAR
+
+CUSTOMVARIABLE TOTALSAMPLESIZE
+LABEL TOTALSAMPLESIZE AS N
+
+PROCESS ../clean_files_for_metaanalysis/ALSPAC_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/EFSOCH_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/MoBa_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/CHB_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/DBDS_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/DNBC_mother.gz
+PROCESS ../clean_files_for_metaanalysis/Mono_ctrls_mother.gz
+PROCESS ../clean_files_for_metaanalysis/PE_ctrls_mother.gz
+PROCESS ../clean_files_for_metaanalysis/PPD_moms_mother.gz
+PROCESS ../clean_files_for_metaanalysis/Gen3G_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/GDAffy_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/GS_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_control_mothers_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_obese_children_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_obese_mothers_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/HUNT_pw_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/Raine_pw_maternal.gz
+
+
+OUTFILE pw_maternal_sex .tbl
+ANALYZE HETEROGENEITY
+CLEAR
+
+CUSTOMVARIABLE TOTALSAMPLESIZE
+LABEL TOTALSAMPLESIZE AS N
+
+PROCESS ../clean_files_for_metaanalysis/ALSPAC_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/EFSOCH_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/MoBa_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/CHB_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/DBDS_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/DNBC_mother_gest.gz
+PROCESS ../clean_files_for_metaanalysis/Mono_ctrls_mother_gest.gz
+PROCESS ../clean_files_for_metaanalysis/PE_ctrls_mother_gest.gz
+PROCESS ../clean_files_for_metaanalysis/PPD_moms_mother_gest.gz
+PROCESS ../clean_files_for_metaanalysis/Gen3G_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/GDAffy_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/GS_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_control_mothers_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_obese_children_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/GOYA_obese_mothers_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/HUNT_pw_gest_maternal.gz
+PROCESS ../clean_files_for_metaanalysis/Raine_pw_gest_maternal.gz
+
+OUTFILE pw_maternal_sex_gest .tbl
+ANALYZE HETEROGENEITY
+CLEAR
+
+CUSTOMVARIABLE TOTALSAMPLESIZE
+LABEL TOTALSAMPLESIZE AS N
+
+PROCESS ../clean_files_for_metaanalysis/EFSOCH_pw_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/MoBa_pw_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/DBDS_pw_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/GDAffy_pw_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/GDIllu_pw_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/GS_pw_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/HUNT_pw_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/Raine_pw_paternal.gz
+
+OUTFILE pw_paternal_sex .tbl
+ANALYZE HETEROGENEITY
+CLEAR
+
+CUSTOMVARIABLE TOTALSAMPLESIZE
+LABEL TOTALSAMPLESIZE AS N
+
+PROCESS ../clean_files_for_metaanalysis/EFSOCH_pw_gest_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/MoBa_pw_gest_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/DBDS_pw_gest_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/GDAffy_pw_gest_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/GDIllu_pw_gest_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/GS_pw_gest_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/HUNT_pw_gest_paternal.gz
+PROCESS ../clean_files_for_metaanalysis/Raine_pw_gest_paternal.gz
+
+OUTFILE pw_paternal_sex_gest .tbl
+ANALYZE HETEROGENEITY
+CLEAR

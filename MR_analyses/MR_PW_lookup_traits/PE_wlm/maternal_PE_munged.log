@@ -1,0 +1,49 @@
+*********************************************************************
+* LD Score Regression (LDSC)
+* Version 1.0.0
+* (C) 2014-2015 Brendan Bulik-Sullivan and Hilary Finucane
+* Broad Institute of MIT and Harvard / MIT Department of Mathematics
+* GNU General Public License v3
+*********************************************************************
+Call: 
+./munge_sumstats.py \
+--out maternal_PE_munged \
+--merge-alleles /gpfs/mrc0/projects/Research_Project-MRC158833/rnb203/programs/ldscores/w_hm3.snplist \
+--N-con 155660.0 \
+--N-cas 7219.0 \
+--a1 Allele1 \
+--a2 Allele2 \
+--snp MarkerName \
+--sumstats maternal_preeclampsia_filtered.gz 
+
+Interpreting column names as follows:
+Allele2:	Allele 2, interpreted as non-ref allele for signed sumstat.
+MarkerName:	Variant ID (e.g., rs number)
+Allele1:	Allele 1, interpreted as ref allele for signed sumstat.
+P-value:	p-Value
+Effect:	[linear/logistic] regression coefficient (0 --> no effect; above 0 --> A1 is trait/risk increasing)
+
+Reading list of SNPs for allele merge from /gpfs/mrc0/projects/Research_Project-MRC158833/rnb203/programs/ldscores/w_hm3.snplist
+Read 1217311 SNPs for allele merge.
+Reading sumstats from maternal_preeclampsia_filtered.gz into memory 5000000 SNPs at a time.
+Read 10756024 SNPs from --sumstats file.
+Removed 9554674 SNPs not in --merge-alleles.
+Removed 0 SNPs with missing values.
+Removed 0 SNPs with INFO <= 0.9.
+Removed 0 SNPs with MAF <= 0.01.
+Removed 0 SNPs with out-of-bounds p-values.
+Removed 377 variants that were not SNPs or were strand-ambiguous.
+1200973 SNPs remain.
+Removed 375 SNPs with duplicated rs numbers (1200598 SNPs remain).
+Median value of Effect was 0.0, which seems sensible.
+Removed 203 SNPs whose alleles did not match --merge-alleles (1200395 SNPs remain).
+Writing summary statistics for 1217311 SNPs (1200395 with nonmissing beta) to maternal_PE_munged.sumstats.gz.
+
+Metadata:
+Mean chi^2 = 1.043
+Lambda GC = 1.034
+Max chi^2 = 35.179
+12 Genome-wide significant SNPs (some may have been removed by filtering).
+
+Conversion finished at Thu Jan 20 11:25:58 2022
+Total time elapsed: 1.0d:22.0h:31.0m:21.82s

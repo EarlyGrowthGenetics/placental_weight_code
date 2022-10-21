@@ -1,0 +1,50 @@
+*********************************************************************
+* LD Score Regression (LDSC)
+* Version 1.0.0
+* (C) 2014-2015 Brendan Bulik-Sullivan and Hilary Finucane
+* Broad Institute of MIT and Harvard / MIT Department of Mathematics
+* GNU General Public License v3
+*********************************************************************
+Call: 
+./munge_sumstats.py \
+--out fetal_PE_munged \
+--merge-alleles /gpfs/mrc0/projects/Research_Project-MRC158833/rnb203/programs/ldscores/w_hm3.snplist \
+--N-con 373345.0 \
+--N-cas 4630.0 \
+--a1 Allele1 \
+--a2 Allele2 \
+--snp MarkerName \
+--sumstats fetal_preeclampsia_filtered.gz 
+
+Interpreting column names as follows:
+Allele2:	Allele 2, interpreted as non-ref allele for signed sumstat.
+MarkerName:	Variant ID (e.g., rs number)
+Allele1:	Allele 1, interpreted as ref allele for signed sumstat.
+P-value:	p-Value
+Effect:	[linear/logistic] regression coefficient (0 --> no effect; above 0 --> A1 is trait/risk increasing)
+
+Reading list of SNPs for allele merge from /gpfs/mrc0/projects/Research_Project-MRC158833/rnb203/programs/ldscores/w_hm3.snplist
+Read 1217311 SNPs for allele merge.
+Reading sumstats from fetal_preeclampsia_filtered.gz into memory 5000000 SNPs at a time.
+Read 10400841 SNPs from --sumstats file.
+Removed 9203454 SNPs not in --merge-alleles.
+Removed 0 SNPs with missing values.
+Removed 0 SNPs with INFO <= 0.9.
+Removed 0 SNPs with MAF <= 0.01.
+Removed 0 SNPs with out-of-bounds p-values.
+Removed 400 variants that were not SNPs or were strand-ambiguous.
+1196987 SNPs remain.
+Removed 400 SNPs with duplicated rs numbers (1196587 SNPs remain).
+Median value of Effect was 0.0002, which seems sensible.
+Removed 209 SNPs whose alleles did not match --merge-alleles (1196378 SNPs remain).
+Writing summary statistics for 1217311 SNPs (1196378 with nonmissing beta) to fetal_PE_munged.sumstats.gz.
+
+Metadata:
+Mean chi^2 = 1.015
+WARNING: mean chi^2 may be too small.
+Lambda GC = 1.004
+Max chi^2 = 34.555
+5 Genome-wide significant SNPs (some may have been removed by filtering).
+
+Conversion finished at Sat Jan 15 11:29:55 2022
+Total time elapsed: 2.0d:1.0h:49.0m:55.68s
