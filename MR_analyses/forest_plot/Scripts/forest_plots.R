@@ -35,8 +35,8 @@ df$y <- ifelse(df$y == max(df$y), df$y - 0.5, df$y)
 
 #### Change column names for legend
 
-df$Analysis[df$Analysis=="Meta"] <- "Meta-analysis"
-df$Analysis[df$Analysis=="WLM"] <- "WLM-adjusted"
+df$Analysis[df$Analysis == "Meta"] <- "Meta-analysis"
+df$Analysis[df$Analysis == "WLM"] <- "WLM-adjusted"
 
 
 ###### Plot
@@ -64,12 +64,12 @@ forest_plot <- ggplot() +
       color = Genome,
       shape = Analysis
     ),
-    size = 3
+    size = 4
   ) + 
   facet_grid(
     exposure ~ .,
-    scales="free",
-    space="free",
+    scales = "free",
+    space = "free",
     labeller = label_wrap_gen(
       width = 2,
       multi_line = T
@@ -101,6 +101,8 @@ forest_plot <- ggplot() +
     panel.grid.minor.y = element_blank(),
     panel.grid.minor.x = element_blank(),
     axis.title.y = element_blank(),
+    axis.text.y.left = element_text(face = "bold"),
+    axis.text.x = element_text(face = "bold"),
     legend.position = c(0.13, 0.96),
     legend.title = element_blank(),
     legend.background = element_rect(
@@ -109,42 +111,14 @@ forest_plot <- ggplot() +
       size = 0.5
     ),
     legend.text = element_text(size = 18),
-    strip.text = element_text(size = 18),
+    strip.text = element_text(size = 18, face = "bold"),
     legend.margin = margin(t = -3, r = 2, b = 2, l = 2, unit = "mm")
   ) 
-
-
-p1 <- ggplot(df, aes(Beta, person)) 
-
-p1 <- p1 + aes(x=Beta, xmin=Beta-1.96*Se, xmax=Beta+1.96*Se, y=person, color=Genome) + geom_pointrange(aes(shape=Analysis), size = 1.5)  +
-                xlim(-0.45,0.55) 
-            
-p1 <- p1 + facet_grid(exposure~.,scales="free",space="free",labeller=label_wrap_gen(width=2,multi_line=+T)) 
-
-p1 <- p1 + geom_vline(xintercept=0) # add 0 line
-
-p1 <- p1 + xlab("") + ylab("") + theme_bw() +
-        theme(text = element_text(face = "bold", size=23, color = "black")) +
-        scale_color_manual(values=c("#009E73","#D55E00")) + 
-        xlab("Effect Size") + 
-        theme(strip.text.y.right = element_text(angle=270)) +
-        theme(axis.text.y.left = element_blank()) + 
-        theme(axis.ticks.y.left = element_blank()) +
-        theme(axis.text.x=element_text(size=20, face = "bold")) + 
-        theme(legend.key = element_rect(fill = "white", colour = "black")) +
-        guides(color = guide_legend(override.aes=list(fill = NA, linetype = 0, size=1), order=1),
-               shape = guide_legend(override.aes = list(linetype = 0), order=2)) + 
-        theme(legend.key.size = unit(1.5, 'cm')) +
-        theme(legend.text = element_text(size=20)) 
-
-         
-  
 
 # save the plot
 
 figure_path <- file.path(here(), 'MR_analyses/forest_plot/Fig6_Mendelian_Randomization.png')
-png(figure_path,
-    width=900, height=900)
+png(figure_path, width = 900, height = 900)
 grid.draw(forest_plot)
 device <- dev.off()
 
