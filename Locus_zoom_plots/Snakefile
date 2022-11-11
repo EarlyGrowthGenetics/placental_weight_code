@@ -1,0 +1,119 @@
+import pandas as pd
+import numpy as np
+import os
+import time
+
+geno_nms=['fetal','maternal','paternal']
+
+rule all:
+        ''
+        input: expand('{geno}/plot_{geno}.pdf', geno= geno_nms)
+                
+
+rule nearest_gene_to_results:
+        'Add nearest gene to top SNPs.'
+        input:                        
+                'meta/pw_{geno}_sex_gest.gz',
+                '{geno}_nearest_gene_to_merge.csv'
+        output:                
+                temp('{geno}/pw_{geno}_sex_gest_nearest_gene.txt')
+        script:                
+                'Scripts/nearest_gene_merge.R'
+ 
+ 
+rule gzip_merged_files:
+        'compress the files'
+        input:
+                '{geno}/pw_{geno}_sex_gest_nearest_gene.txt'
+        output:
+                '{geno}/pw_{geno}_sex_gest_nearest_gene.txt.gz'
+        shell:
+                'gzip {input}'
+
+
+rule format_locuszoom:
+        'Format locuszoom metal file.'
+        input:
+                '{geno}/pw_{geno}_sex_gest_nearest_gene.txt.gz'
+        output:
+                '{geno}/{geno}_formatted.txt'
+        run:
+                d= pd.read_csv(input[0], sep= '\t', header=0, usecols= ['MarkerName', 'pvalue', 'nearestGene'], compression= 'gzip')
+                d.sort_values(['pvalue'], ascending=True, inplace= True)
+                d.drop_duplicates(['MarkerName'], inplace= True, keep= 'first')
+                #d['ID']= 'MarkerName'
+                d.columns= ['MarkerName', 'P-value', 'nearestGene']
+                d.to_csv(output[0], sep= '\t', header= True, index= False, columns= ['MarkerName', 'P-value'])
+
+
+rule locuszoom_top_regions:
+        'Top regions for Locuszoom'
+        input:
+                '{geno}/pw_{geno}_sex_gest_nearest_gene.txt.gz'
+        output:
+                '{geno}/{geno}_top_regions.txt'
+        run:
+                df= pd.read_csv(input[0], sep= '\t', header=0, usecols= ['MarkerName','CHR', 'POS', 'pvalue', 'nearestGene'], compression= 'gzip')
+                df= df.loc[df.pvalue< 5*10**-8, :]
+                df.sort_values(by= 'pvalue', ascending= True, inplace= True)
+                df.drop_duplicates(subset= ['CHR', 'POS'], keep= 'first', inplace= True)
+                df['nearestGene'].replace('', np.nan, inplace=True)
+                df.dropna(subset=['nearestGene'], inplace=True)
+                df_list= list()
+                for chrom in set(df.CHR):
+                        d_temp= df.loc[df.CHR== chrom, :]
+                        positions= d_temp.POS.values
+                        for pos in positions:
+                                if pos in d_temp.POS.values:
+                                        df_list.append(d_temp.loc[d_temp.POS== pos, :])
+                                        d_temp= d_temp.loc[(d_temp.POS < pos - (1.5 * 10**6)) | (d_temp.POS> pos + (1.5 * 10**6)), :]
+                                else:
+                                        continue
+                df= pd.concat(df_list)
+                df['CHR']= df.CHR.astype(str)
+                df['CHR']= np.where(df.CHR== '23', 'X', df.CHR)
+                df.columns= ['snp', 'pvalue', 'chr', 'POS', 'nearestGene']
+                df.to_csv(output[0], sep= '\t', header= True, index= False)
+
+
+checkpoint locuszoom_plot:
+        'Plot locuszoom'
+        input:
+                '{geno}/{geno}_top_regions.txt',
+                '{geno}/{geno}_formatted.txt'
+        output:
+                directory('{geno}/plots')
+        params:
+                '{geno}/plots/x',
+                '{geno}/plots/'
+        run:
+                if not os.path.exists(params[1]):
+                        os.makedirs(params[1])
+                df= pd.read_csv(input[0], sep= '\t', header= 0)
+                for index, row in df.iterrows():
+                        snp= row['snp']
+                        title= '"' + row['nearestGene'] + '"'
+                        shell('python2 locuszoom/bin/locuszoom --metal {input[1]} --refsnp {snp} --flank 250kb --plotonly --no-date --build hg19 --pop EUR --source 1000G_March2012 --prefix {params[0]} title={title} theme=publication')
+                        outfile= params[1] + 'chr' + str(row['chr']) + '_' + row['nearestGene'] + '.pdf'
+                        infile= params[0] + '_' + snp.replace(':', '_') + '.pdf'
+                        shell('qpdf --empty --pages {infile} 1 -- {outfile}; rm {infile}')
+                        
+def aggregate_locuszoom(wildcards):
+        'Aggregate the files from locus_ID wildcard.'
+        checkpoint_output = checkpoints.locuszoom_plot.get(**wildcards).output[0]
+        return expand('{geno}/plots/{locus_ID}.pdf', locus_ID= glob_wildcards(os.path.join(checkpoint_output, '{locus_ID}.pdf')).locus_ID)
+
+
+rule merge_locuszoom_outputs:
+        ''
+        input:
+                aggregate_locuszoom
+        output:
+                '{{geno}}/plot_{geno}.pdf'
+        run:
+                if len(input)== 1:
+                        shell('cp {input[0]} {output[0]}')
+                else:
+                        shell('qpdf --empty --pages {input} -- {output[0]}')
+
+
