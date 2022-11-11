@@ -32,10 +32,6 @@ df$y <- as.numeric(df$person)
 df$y <- ifelse(df$y == min(df$y), df$y + 0.5, df$y)
 df$y <- ifelse(df$y == max(df$y), df$y - 0.5, df$y)
 
-#### Convert BP to 10mm Hg instead of 1 mm Hg
-
-df$Beta <- ifelse((df$exposure=="SBP" | df$exposure== "DBP"), df$Beta*10, df$Beta)
-df$Se <- ifelse((df$exposure=="SBP" | df$exposure== "DBP"), df$Se*10, df$Se)
 
 #### Change column names for legend
 
@@ -146,7 +142,7 @@ p1 <- p1 + xlab("") + ylab("") + theme_bw() +
 
 # save the plot
 
-figure_path <- file.path(here(), 'MR_analyses/forest_plot/Fig6_Mendelian_Randomization_2.png')
+figure_path <- file.path(here(), 'MR_analyses/forest_plot/Fig6_Mendelian_Randomization.png')
 png(figure_path,
     width=900, height=900)
 grid.draw(forest_plot)

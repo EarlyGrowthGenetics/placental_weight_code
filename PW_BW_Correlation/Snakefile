@@ -1,0 +1,118 @@
+import pandas as pd
+import numpy as np
+import os
+import time
+
+
+cov_nms=['gest','bwt']
+
+#### Own birth weight uses: 'Fetal_BW_European_meta.NG2019.txt.gz'
+#### Note Fetal and Maternal files have different headers and need to be formated accordingly
+
+rule all:
+        ''
+        input:
+            'Fetal/wlm/fetal_wlm.txt.gz',
+           expand('maternal_effect_bwt_wlm/{cov}.sumstats.gz', cov=cov_nms),
+           'maternal_effect_bwt_wlm/pwt_corr_bwt.log',
+           expand('maternal_effect_bwt_wlm/{cov}_h2.log', cov=cov_nms)
+
+
+rule format_sum_stats:
+        'format the summary stats files for LDSC' 
+        input:
+            'Fetal/wlm/fetal_wlm.txt.gz',
+            '.Maternal/Maternal_Effect_European_meta_NG2019.txt.gz',
+            'Programs/ldsc/w_hm3.snplist'
+        
+        params:
+            'maternal_effect_bwt_wlm/Fetal_gest',
+            'maternal_effect_bwt_wlm/Fetal_bwt'           
+
+        output:
+            'maternal_effect_bwt_wlm/Fetal_gest.gz',
+            'maternal_effect_bwt_wlm/Fetal_bwt.gz'
+        
+        script:
+            'R_scripts/data_formating.R'
+
+
+rule munge_sumstats:
+        'munge the summary stats ready for ldsc'
+        input:
+            'maternal_effect_bwt_wlm/Fetal_{cov}.gz'
+           
+        params:
+            'maternal_effect_bwt_wlm/{cov}'
+
+        output:
+            'maternal_effect_bwt_wlm/{cov}.sumstats.gz'
+
+        shell:
+            '''
+            set +eu
+            source miniconda3/etc/profile.d/conda.sh
+            conda activate ldsc
+            python2 Programs/ldsc/munge_sumstats.py \
+            --sumstats {input[0]} \
+            --out {params[0]} \
+            --merge-alleles Programs/ldsc/w_hm3.snplist \
+            --chunksize 500000
+            conda deactivate
+            set -eu
+            '''
+
+# LD Score Regression
+
+rule LDscore_regression:
+        'Calculate the LD Score Regression'
+        input:
+            'maternal_effect_bwt_wlm/gest.sumstats.gz',
+            'maternal_effect_bwt_wlm/bwt.sumstats.gz'
+        
+        params:
+            'maternal_effect_bwt_wlm/pwt_corr_bwt'
+
+        output:
+            'maternal_effect_bwt_wlm/pwt_corr_bwt.log'
+
+        shell:
+            ''' 
+            set +eu
+            source miniconda3/etc/profile.d/conda.sh
+            conda activate ldsc
+            python2 Programs/ldsc/ldsc.py \
+            --rg {input[0]},{input[1]} \
+            --ref-ld-chr Programs/ldsc/eur_w_ld_chr/ \
+            --w-ld-chr Programs/ldsc/eur_w_ld_chr/ \
+            --out {params[0]}
+            conda deactivate
+            set -eu 
+            '''
+
+# heritability not used
+
+rule Calculate_Heritability:
+        'Calculate the Heritability'
+        input:
+            'maternal_effect_bwt_wlm/{cov}.sumstats.gz'
+
+        params:
+            'maternal_effect_bwt_wlm/{cov}_h2'
+            
+        output:
+            'maternal_effect_bwt_wlm/{cov}_h2.log'
+
+        shell:
+            '''
+            set +eu
+            source miniconda3/etc/profile.d/conda.sh
+            conda activate ldsc
+            python2 Programs/ldsc/ldsc.py \
+            --h2 {input[0]} \
+            --ref-ld-chr Programs/ldsc/eur_w_ld_chr/ \
+            --w-ld-chr Programs/ldsc/eur_w_ld_chr/ \
+            --out {params[0]}
+            conda deactivate
+            set -eu 
+            '''
