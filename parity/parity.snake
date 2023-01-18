@@ -6,7 +6,7 @@ import os
 #
 # Commands to execute from the repository folder:
 # conda activate snakemake
-# snakemake --snakefile parity/parity.snake --cores 4 --rerun-incomplete
+# snakemake --snakefile parity/parity.snake --cores 1 --rerun-incomplete --use-conda
 ##
 
 # Paths - set to the home node of the BerGoMo server
@@ -37,6 +37,7 @@ rule extract_genotypes:
           keep = top_hits_file,
     conda:
         "env/plink2.yaml"
+    threads: 1
     shell:
          """
           plink2 \

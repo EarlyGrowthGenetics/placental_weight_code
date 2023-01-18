@@ -1,11 +1,5 @@
-name: r_4.2
+name: plink2
 channels:
-  - conda-forge
+  - bioconda
 dependencies:
-  - r-base=4.2
-  - r-shiny
-  - r-visnetwork
-  - r-dplyr
-  - r-ggplot2
-  - r-dt
-  - r-igraph
+  - plink2
