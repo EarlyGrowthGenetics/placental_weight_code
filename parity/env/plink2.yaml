@@ -1,0 +1,11 @@
+name: r_4.2
+channels:
+  - conda-forge
+dependencies:
+  - r-base=4.2
+  - r-shiny
+  - r-visnetwork
+  - r-dplyr
+  - r-ggplot2
+  - r-dt
+  - r-igraph

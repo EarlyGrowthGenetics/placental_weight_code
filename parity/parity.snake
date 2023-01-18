@@ -1,0 +1,47 @@
+import os
+
+##
+#
+# This runs the parity analysis of the placental weight paper.
+#
+# Commands to execute from the repository folder:
+# conda activate snakemake
+# snakemake --snakefile parity/parity.snake --cores 4 --rerun-incomplete
+##
+
+# Paths - set to the home node of the BerGoMo server
+plink_folder = '/mnt/archive/moba/geno/MOBAGENETICS_1.0/genotypes-base/imputed/all/plink' # The folder containing the genotypes of MoBa genetics 1.0
+trio_file = '/mnt/work/marc/egg/placental_weight/trio' # the identifiers of unrelated triads used throughout the paper
+data_folder = '/mnt/work/marc/egg/placental_weight/data' # Folder with the files that should not go outside the folder
+top_hits_file = 'parity/top_hits'
+
+# Variables
+
+# Chromosomes to run
+chromosomes = range(1, 24)
+
+# Rules
+
+rule all:
+    input:
+         expand(os.path.join(data_folder, 'genotypes_top_snps', '{chr}'), chr=chromosomes)
+
+rule extract_genotypes:
+    # Extracts the genotypes for the top hits
+    input:
+         geno = os.path.join(plink_folder, '{chr}.bed')
+    output:
+         snp = os.path.join(data_folder, 'genotypes_top_snps', '{chr}')
+    params:
+          base_file = os.path.join(plink_folder, '{chr}.bed'),
+          keep = top_hits_file,
+    conda:
+        "env/plink2.yaml"
+    shell:
+         """
+          plink2 \
+             --bfile {params.base_file} \
+             --keep {params.keep} \
+             --export A \
+             --out {output.snp}
+         """
