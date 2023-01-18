@@ -42,7 +42,7 @@ rule extract_genotypes:
          """
           plink2 \
              --bfile {params.base_file} \
-             --keep {params.keep} \
+             --extract {params.keep} \
              --export A \
              --out {output.snp}
          """
