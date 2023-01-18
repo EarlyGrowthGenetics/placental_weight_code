@@ -31,7 +31,7 @@ rule extract_genotypes:
     input:
          geno = os.path.join(plink_folder, '{chr}.bed')
     output:
-         snp = os.path.join(data_folder, 'genotypes_top_snps', '{chr}')
+         snp = os.path.join(data_folder, 'genotypes_top_snps', '{chr}.raw')
     params:
           base_file = os.path.join(plink_folder, '{chr}'),
           keep = top_hits_file,
