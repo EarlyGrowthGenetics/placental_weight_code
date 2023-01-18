@@ -24,7 +24,7 @@ chromosomes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 19, 20}
 
 rule all:
     input:
-         expand(os.path.join(data_folder, 'genotypes_top_snps', '{chr}'), chr=chromosomes)
+         expand(os.path.join(data_folder, 'genotypes_top_snps', '{chr}.raw'), chr=chromosomes)
 
 rule extract_genotypes:
     # Extracts the genotypes for the top hits
