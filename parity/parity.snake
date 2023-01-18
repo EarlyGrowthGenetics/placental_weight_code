@@ -35,6 +35,7 @@ rule extract_genotypes:
     params:
           base_file = os.path.join(plink_folder, '{chr}'),
           keep = top_hits_file,
+          genotypes = os.path.join(data_folder, 'genotypes_top_snps', '{chr}')
     conda:
         "env/plink2.yaml"
     threads: 1
@@ -44,5 +45,5 @@ rule extract_genotypes:
              --bfile {params.base_file} \
              --extract {params.keep} \
              --export A \
-             --out {output.snp}
+             --out {params.genotypes}
          """
