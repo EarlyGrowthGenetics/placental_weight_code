@@ -18,7 +18,7 @@ top_hits_file = 'parity/top_hits'
 # Variables
 
 # Chromosomes to run
-chromosomes = range(1, 24)
+chromosomes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 19, 20}
 
 # Rules
 
