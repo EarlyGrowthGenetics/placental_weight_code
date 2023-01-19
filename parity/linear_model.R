@@ -233,12 +233,16 @@ parity_lm_coefficients <- do.call("rbind", parity_lm_coefficients)
 pw_lm_coefficients <- do.call("rbind", pw_lm_coefficients)
 stratified_pw_lm_coefficients <- do.call("rbind", stratified_pw_lm_coefficients)
 
+parity_lm_coefficients$variable <- row.names(parity_lm_coefficients)
+pw_lm_coefficients$variable <- row.names(pw_lm_coefficients)
+stratified_pw_lm_coefficients$variable <- row.names(stratified_pw_lm_coefficients)
+
 
 # Export results
 
 write.table(
   parity_lm_coefficients,
-  file = gzfile("parity/lm/parity_lm_coefficients.gz"),
+  file = gzfile(file.path(here(), "parity/lm/parity_lm_coefficients.gz")),
   col.names = T,
   row.names = F,
   sep = "\t"
@@ -246,7 +250,7 @@ write.table(
 
 write.table(
   pw_lm_coefficients,
-  file = gzfile("parity/lm/pw_lm_coefficients.gz"),
+  file = gzfile(file.path(here(), "parity/lm/pw_lm_coefficients.gz")),
   col.names = T,
   row.names = F,
   sep = "\t"
@@ -254,7 +258,7 @@ write.table(
 
 write.table(
   stratified_pw_lm_coefficients,
-  file = gzfile("parity/lm/stratified_pw_lm_coefficients.gz"),
+  file = gzfile(file.path(here(), "parity/lm/stratified_pw_lm_coefficients.gz")),
   col.names = T,
   row.names = F,
   sep = "\t"
