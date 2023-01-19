@@ -164,6 +164,7 @@ for (variant_id in variants_table$snp) {
     lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
     
     lm_results_summary_coefficients$snp <- variant_id
+    lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
     
     parity_lm_coefficients[[length(parity_lm_coefficients) + 1]] <- lm_results_summary_coefficients
     
@@ -181,6 +182,7 @@ for (variant_id in variants_table$snp) {
     
     lm_results_summary_coefficients$snp <- variant_id
     lm_results_summary_coefficients$model <- "pw"
+    lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
     
     pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
     
@@ -198,6 +200,7 @@ for (variant_id in variants_table$snp) {
     
     lm_results_summary_coefficients$snp <- variant_id
     lm_results_summary_coefficients$model <- "pw + parity"
+    lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
     
     pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
     
@@ -222,6 +225,7 @@ for (variant_id in variants_table$snp) {
       
       lm_results_summary_coefficients$snp <- variant_id
       lm_results_summary_coefficients$parity_level <- parity_level
+      lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
       
       stratified_pw_lm_coefficients[[length(stratified_pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
       
@@ -232,10 +236,6 @@ for (variant_id in variants_table$snp) {
 parity_lm_coefficients <- do.call("rbind", parity_lm_coefficients)
 pw_lm_coefficients <- do.call("rbind", pw_lm_coefficients)
 stratified_pw_lm_coefficients <- do.call("rbind", stratified_pw_lm_coefficients)
-
-parity_lm_coefficients$variable <- row.names(parity_lm_coefficients)
-pw_lm_coefficients$variable <- row.names(pw_lm_coefficients)
-stratified_pw_lm_coefficients$variable <- row.names(stratified_pw_lm_coefficients)
 
 
 # Export results
