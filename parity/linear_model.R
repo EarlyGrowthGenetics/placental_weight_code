@@ -182,13 +182,13 @@ for (variant_id in variants_table$rsid) {
     lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
     
     lm_results_summary_coefficients$snp <- variant_id
-    lm_results_summary_coefficients$model <- "sex + ga"
+    lm_results_summary_coefficients$model <- "sex"
     lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
     
     pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
     
     
-    # sex ga
+    # sex + ga
     
     lm_results <- lm(
       formula = "z_placenta_weight ~ value + sex + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
