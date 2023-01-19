@@ -170,7 +170,25 @@ for (variant_id in variants_table$rsid) {
     parity_lm_coefficients[[length(parity_lm_coefficients) + 1]] <- lm_results_summary_coefficients
     
     
-    # PW
+    # sex
+    
+    lm_results <- lm(
+      formula = "z_placenta_weight ~ value + sex + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
+      data = snp_table
+    )
+    
+    lm_results_summary <- summary(lm_results)
+    
+    lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
+    
+    lm_results_summary_coefficients$snp <- variant_id
+    lm_results_summary_coefficients$model <- "sex + ga"
+    lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
+    
+    pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
+    
+    
+    # sex ga
     
     lm_results <- lm(
       formula = "z_placenta_weight ~ value + sex + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
@@ -182,13 +200,13 @@ for (variant_id in variants_table$rsid) {
     lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
     
     lm_results_summary_coefficients$snp <- variant_id
-    lm_results_summary_coefficients$model <- "pw"
+    lm_results_summary_coefficients$model <- "sex + ga"
     lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
     
     pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
     
     
-    # PW + parity
+    # sex + ga + parity
     
     lm_results <- lm(
       formula = "z_placenta_weight ~ value + sex + z_parity + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
@@ -200,7 +218,7 @@ for (variant_id in variants_table$rsid) {
     lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
     
     lm_results_summary_coefficients$snp <- variant_id
-    lm_results_summary_coefficients$model <- "pw + parity"
+    lm_results_summary_coefficients$model <- "sex + ga + parity"
     lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
     
     pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
