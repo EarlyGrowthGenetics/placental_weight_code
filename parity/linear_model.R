@@ -16,11 +16,12 @@ library(janitor)
 
 # Load variants
 variants_table <- read.table(
-  file = file.path(here(), "parity/targets_pw_20.01.22"),
+  file = file.path(here(), "parity/extract_supp_table_7_23.01.18"),
   sep = "\t",
   header = T,
   stringsAsFactors = F
-)
+) %>% 
+  clean_names()
 
 
 # Load trios
@@ -139,7 +140,7 @@ parity_lm_coefficients <- list()
 pw_lm_coefficients <- list()
 stratified_pw_lm_coefficients <- list()
 
-for (variant_id in variants_table$snp) {
+for (variant_id in variants_table$rsid) {
   
   snp_table <- genotypes %>% 
     filter(
