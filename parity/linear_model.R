@@ -72,6 +72,17 @@ pcs_table <- read.table(
 
 
 # Load phenotypes
+id_table <- read.table(
+  file = "/mnt/archive/moba/pheno/v10/V10_1.1.1-221121/id.gz",
+  sep = "\t",
+  header = T,
+  stringsAsFactors = F
+) %>% 
+  select(
+    child_id, mother_id, father_id
+  ) %>% 
+  distinct()
+
 pregnancy_table <- read.table(
   file = "/mnt/archive/moba/pheno/v10/V10_1.1.1-221121/pregnancy.gz",
   sep = "\t",
@@ -133,6 +144,56 @@ child_table <- pheno_table %>%
     abs(z_placenta_weight) <= 5
   )
 
+mother_table <- pheno_table %>% 
+  filter(
+    mother_SentrixID %in% sample_list$mother_SentrixID
+  ) %>% 
+  select(
+    iid = mother_SentrixID, sex, pregnancy_duration, parity, placenta_weight
+  ) %>% 
+  left_join(
+    pcs_table %>% 
+      select(
+        iid, starts_with("pc")
+      ),
+    by = "iid"
+  ) %>% 
+  mutate(
+    z_placenta_weight = (placenta_weight - mean(placenta_weight)) / sd(placenta_weight),
+    z_parity = (parity - mean(parity)) / sd(parity)
+  ) %>% 
+  filter(
+    abs(z_placenta_weight) <= 5
+  )
+
+father_table <- pheno_table %>% 
+  filter(
+    father_SentrixID %in% sample_list$father_SentrixID
+  ) %>% 
+  select(
+    iid = father_SentrixID, sex, pregnancy_duration, parity, placenta_weight
+  ) %>% 
+  left_join(
+    pcs_table %>% 
+      select(
+        iid, starts_with("pc")
+      ),
+    by = "iid"
+  ) %>% 
+  mutate(
+    z_placenta_weight = (placenta_weight - mean(placenta_weight)) / sd(placenta_weight),
+    z_parity = (parity - mean(parity)) / sd(parity)
+  ) %>% 
+  filter(
+    abs(z_placenta_weight) <= 5
+  )
+
+pheno_tables <- list(
+  child = child_table,
+  mother = mother_table,
+  father = father_table
+)
+
 
 # Run linear model with parity
 
@@ -142,112 +203,167 @@ stratified_pw_lm_coefficients <- list()
 
 for (variant_id in variants_table$rsid) {
   
-  snp_table <- genotypes %>% 
-    filter(
-      startsWith(variant, variant_id)
-    ) %>% 
-    inner_join(
-      child_table,
-      by = "iid"
-    )
-  
-  if (nrow(snp_table) > 0) {
+  for (individual in names(pheno_tables)) {
     
-    # Parity
+    pheno_table <- pheno_tables[[individual]]
     
-    lm_results <- lm(
-      formula = "z_parity ~ value + sex + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
-      data = snp_table
-    )
+    snp_table <- genotypes %>% 
+      filter(
+        startsWith(variant, variant_id)
+      ) %>% 
+      inner_join(
+        child_table,
+        by = "iid"
+      )
     
-    lm_results_summary <- summary(lm_results)
-    
-    lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
-    
-    lm_results_summary_coefficients$snp <- variant_id
-    lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
-    
-    parity_lm_coefficients[[length(parity_lm_coefficients) + 1]] <- lm_results_summary_coefficients
-    
-    
-    # sex
-    
-    lm_results <- lm(
-      formula = "z_placenta_weight ~ value + sex + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
-      data = snp_table
-    )
-    
-    lm_results_summary <- summary(lm_results)
-    
-    lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
-    
-    lm_results_summary_coefficients$snp <- variant_id
-    lm_results_summary_coefficients$model <- "sex"
-    lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
-    
-    pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
-    
-    
-    # sex + ga
-    
-    lm_results <- lm(
-      formula = "z_placenta_weight ~ value + sex + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
-      data = snp_table
-    )
-    
-    lm_results_summary <- summary(lm_results)
-    
-    lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
-    
-    lm_results_summary_coefficients$snp <- variant_id
-    lm_results_summary_coefficients$model <- "sex + ga"
-    lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
-    
-    pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
-    
-    
-    # sex + ga + parity
-    
-    lm_results <- lm(
-      formula = "z_placenta_weight ~ value + sex + z_parity + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
-      data = snp_table
-    )
-    
-    lm_results_summary <- summary(lm_results)
-    
-    lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
-    
-    lm_results_summary_coefficients$snp <- variant_id
-    lm_results_summary_coefficients$model <- "sex + ga + parity"
-    lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
-    
-    pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
-    
-    
-    # Stratify
-    
-    for (parity_level in 0:2) {
+    if (nrow(snp_table) > 0) {
       
-      temp_table <- snp_table %>% 
-        filter(
-          parity == parity_level
-        )
+      # Parity
       
       lm_results <- lm(
-        formula = "z_placenta_weight ~ value + sex + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
-        data = temp_table
+        formula = "z_parity ~ value + sex + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
+        data = snp_table
       )
       
       lm_results_summary <- summary(lm_results)
       
       lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
       
+      lm_results_summary_coefficients$individual <- individual
+      lm_results_summary_coefficients$n <- nrow(snp_table)
       lm_results_summary_coefficients$snp <- variant_id
-      lm_results_summary_coefficients$parity_level <- parity_level
       lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
       
-      stratified_pw_lm_coefficients[[length(stratified_pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
+      parity_lm_coefficients[[length(parity_lm_coefficients) + 1]] <- lm_results_summary_coefficients
       
+      
+      # no covariate
+      
+      lm_results <- lm(
+        formula = "z_placenta_weight ~ value + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
+        data = snp_table
+      )
+      
+      lm_results_summary <- summary(lm_results)
+      
+      lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
+      
+      lm_results_summary_coefficients$individual <- individual
+      lm_results_summary_coefficients$n <- nrow(snp_table)
+      lm_results_summary_coefficients$snp <- variant_id
+      lm_results_summary_coefficients$model <- "none"
+      lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
+      
+      pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
+      
+      
+      # sex
+      
+      lm_results <- lm(
+        formula = "z_placenta_weight ~ value + sex + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
+        data = snp_table
+      )
+      
+      lm_results_summary <- summary(lm_results)
+      
+      lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
+      
+      lm_results_summary_coefficients$individual <- individual
+      lm_results_summary_coefficients$n <- nrow(snp_table)
+      lm_results_summary_coefficients$snp <- variant_id
+      lm_results_summary_coefficients$model <- "sex"
+      lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
+      
+      pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
+      
+      
+      # sex + ga
+      
+      lm_results <- lm(
+        formula = "z_placenta_weight ~ value + sex + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
+        data = snp_table
+      )
+      
+      lm_results_summary <- summary(lm_results)
+      
+      lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
+      
+      lm_results_summary_coefficients$individual <- individual
+      lm_results_summary_coefficients$n <- nrow(snp_table)
+      lm_results_summary_coefficients$snp <- variant_id
+      lm_results_summary_coefficients$model <- "sex + ga"
+      lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
+      
+      pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
+      
+      
+      # sex + ga + parity
+      
+      lm_results <- lm(
+        formula = "z_placenta_weight ~ value + sex + z_parity + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
+        data = snp_table
+      )
+      
+      lm_results_summary <- summary(lm_results)
+      
+      lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
+      
+      lm_results_summary_coefficients$individual <- individual
+      lm_results_summary_coefficients$n <- nrow(snp_table)
+      lm_results_summary_coefficients$snp <- variant_id
+      lm_results_summary_coefficients$model <- "sex + ga + parity"
+      lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
+      
+      pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
+      
+      
+      # sex + ga + parity + interaction
+      
+      lm_results <- lm(
+        formula = "z_placenta_weight ~ value + sex + z_parity + z_parity * value + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
+        data = snp_table
+      )
+      
+      lm_results_summary <- summary(lm_results)
+      
+      lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
+      
+      lm_results_summary_coefficients$individual <- individual
+      lm_results_summary_coefficients$n <- nrow(snp_table)
+      lm_results_summary_coefficients$snp <- variant_id
+      lm_results_summary_coefficients$model <- "sex + ga + parity + parity * snp"
+      lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
+      
+      pw_lm_coefficients[[length(pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
+      
+      
+      # Stratify
+      
+      for (parity_level in 0:2) {
+        
+        temp_table <- snp_table %>% 
+          filter(
+            parity == parity_level
+          )
+        
+        lm_results <- lm(
+          formula = "z_placenta_weight ~ value + sex + pregnancy_duration + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + pc7 + pc8 + pc9 + pc10",
+          data = temp_table
+        )
+        
+        lm_results_summary <- summary(lm_results)
+        
+        lm_results_summary_coefficients <- as.data.frame(lm_results_summary$coefficients)
+        
+        lm_results_summary_coefficients$individual <- individual
+        lm_results_summary_coefficients$n <- nrow(temp_table)
+        lm_results_summary_coefficients$snp <- variant_id
+        lm_results_summary_coefficients$parity_level <- parity_level
+        lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
+        
+        stratified_pw_lm_coefficients[[length(stratified_pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
+        
+      }
     }
   }
 }
