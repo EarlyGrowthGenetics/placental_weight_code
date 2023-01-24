@@ -5,7 +5,7 @@ library(ggplot2)
 library(grid)
 
 df <- read.table(
-  file = file.path(here(), 'MR_analyses/forest_plot/Data/plots_data.csv.gz'),
+  file = file.path(here(), 'placental_weight_code/MR_analyses/forest_plot/Data/plots_data.csv.gz'),
   header = T,
   sep = ","
   )
@@ -80,7 +80,7 @@ forest_plot <- ggplot() +
   ) +
   scale_y_continuous(
     breaks = c(1.75, 3.25),
-    labels = c("Fetal", "Maternal"),
+    labels = c("Maternal", "Fetal"),
     limits = c(1, 4)
   ) +
   scale_color_manual(
@@ -108,7 +108,7 @@ forest_plot <- ggplot() +
     legend.background = element_rect(
       fill = "white",
       color = "grey20",
-      size = 0.5
+      linewidth = 0.5
     ),
     legend.text = element_text(size = 18),
     strip.text = element_text(size = 18, face = "bold"),
@@ -117,7 +117,7 @@ forest_plot <- ggplot() +
 
 # save the plot
 
-figure_path <- file.path(here(), 'MR_analyses/forest_plot/Fig6_Mendelian_Randomization.png')
+figure_path <- file.path(here(), 'placental_weight_code/MR_analyses/forest_plot/Fig6_Mendelian_Randomization.png')
 png(figure_path, width = 900, height = 900)
 grid.draw(forest_plot)
 device <- dev.off()
