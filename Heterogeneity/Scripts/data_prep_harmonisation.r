@@ -11,32 +11,22 @@ library(ggplot2)
 
 th <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top.csv', header=F)
 
-Meta <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/Meta.txt')
-MoBa <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/MoBa.txt')
-ALSPAC <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/ALSPAC.txt')
-DNBC <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/DNBC.txt')
-EFSOCH <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/EFSOCH.txt')
-GENR <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/GENR.txt')
-GOYA_obese_children <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/GOYA_obese_children.txt')
-GOYA_obese_mothers <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/GOYA_obese_mothers.txt')
-GOYA_control_mothers <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/GOYA_control_mothers.txt')
-FS <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/FS.txt')
-GSAV2 <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/GSAV2.txt')
-IHPS_casesCtrls_MEGAex <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/IHPS_casesCtrls_MEGAex.txt')
-IHPS_CIDR <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/IHPS_CIDR.txt')
-INMAGSA <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/INMAGSA.txt')
-INMAOmni <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/INMAOmni.txt')
-iPSYCH <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/iPSYCH.txt')
-NFBC1966 <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/NFBC1966.txt')
-NFBC1986 <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/NFBC1986.txt')
-OPI <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/OPI.txt')
-PANIC <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/PANIC.txt')
-RaineStudy <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/RaineStudy.txt')
-Roskilde <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/Roskilde.txt')
+# Set the path to the folder containing the .txt files
+path <- '/home/christopher/Desktop/child_gest/LDSC_Files/top_hits_files/'
 
+# Get a list of all .txt files in the folder
+txt_files <- list.files(path, pattern = "\\.txt$", full.names = TRUE)
 
+# Loop through each .txt file, read it into a dataframe, and assign the file name as the dataframe name
+for (file in txt_files) {
+  df <- read.table(file, header = TRUE, sep = "\t")
+  file_name <- gsub("\\.txt$", "", basename(file))
+  assign(file_name, df)
+}
+
+# create a marker variable for each cohort
 th <- th %>% rename(marker = V1)
-Meta <- Meta %>% rename(marker ="chr:pos")
+Meta <- Meta %>% rename(marker ="chr.pos")
 MoBa$marker <- paste(MoBa$CHR, MoBa$POS, sep=':')
 ALSPAC <- ALSPAC %>%  rename(marker = SNPID)
 DNBC$marker <- paste(DNBC$CHR, DNBC$POS, sep=':')
@@ -65,29 +55,21 @@ GSAV2$N <- 195
 
 names(iPSYCH)[2] <- "SNP_Name"
 
+# create a list of dataframes
+
+df_list <- list(ALSPAC, DNBC, EFSOCH, FS, GENR, GOYA_control_mothers, GOYA_obese_children, GOYA_obese_mothers,
+                GSAV2, IHPS_casesCtrls_MEGAex, IHPS_CIDR, INMAGSA, INMAOmni, iPSYCH, Meta, MoBa,
+                NFBC1966, NFBC1986, OPI, PANIC, RaineStudy, Roskilde)
+
 # merge dataframes with th dataframe to check only valid variants included (One in chr 22 had the same position and got picked up with grep)
-Meta <- inner_join(th, Meta, by='marker', all=F)
-MoBa <- inner_join(th, MoBa, by='marker', all=F)
-ALSPAC <- inner_join(th, ALSPAC, by='marker', all=F)
-DNBC <- inner_join(th, DNBC, by='marker', all=F)
-EFSOCH <- inner_join(th, EFSOCH, by='marker', all=F)
-GENR <- inner_join(th, GENR, by='marker', all=F)
-GOYA_obese_children <- inner_join(th, GOYA_obese_children, by='marker', all=F)
-GOYA_obese_mothers <- inner_join(th, GOYA_obese_mothers, by='marker', all=F)
-GOYA_control_mothers <- inner_join(th, GOYA_control_mothers, by='marker', all=F)
-FS <- inner_join(th, FS, by='marker', all=F)
-GSAV2 <- inner_join(th, GSAV2, by='marker', all=F)
-IHPS_casesCtrls_MEGAex <- inner_join(th, IHPS_casesCtrls_MEGAex, by='marker', all=F)
-IHPS_CIDR <- inner_join(th, IHPS_CIDR, by='marker', all=F)
-INMAGSA <- inner_join(th, INMAGSA, by='marker', all=F)
-INMAOmni <- inner_join(th, INMAOmni, by='marker', all=F)
-iPSYCH <- inner_join(th, iPSYCH, by='marker', all=F)
-NFBC1966 <- inner_join(th, NFBC1966, by='marker', all=F)
-NFBC1986 <- inner_join(th, NFBC1986, by='marker', all=F)
-OPI <- inner_join(th, OPI, by='marker', all=F)
-PANIC <- inner_join(th, PANIC, by='marker', all=F)
-RaineStudy <- inner_join(th, RaineStudy, by='marker', all=F)
-Roskilde <- inner_join(th, Roskilde, by='marker', all=F)
+
+joined_data <- lapply(df_list, function(x) inner_join(th, x, by='marker', all=F))
+
+names(joined_data) <- c("ALSPAC", "DNBC", "EFSOCH", "FS", "GENR", "GOYA_control_mothers", "GOYA_obese_children", "GOYA_obese_mothers", 
+                    "GSAV2", "IHPS_casesCtrls_MEGAex", "IHPS_CIDR", "INMAGSA", "INMAOmni", "iPSYCH",  "Meta", "MoBa","NFBC1966", "NFBC1986", 
+                    "OPI", "PANIC", "RaineStudy", "Roskilde")
+
+list2env(joined_data, envir = .GlobalEnv)
 
 Meta <- Meta %>%rename (
   Markername = marker,
@@ -118,7 +100,7 @@ MoBa <- MoBa %>% select('marker', 'SNPID', 'EFFECT_ALLELE', 'NON_EFFECT_ALLELE',
           P = PVAL
 ) 
 
-#get rsid from MoBa to merge with pther cohorts
+#get rsid from MoBa to merge with other cohorts
 
 snp <- MoBa %>% select(Markername, SNP)
 
@@ -149,8 +131,12 @@ df_list <- lapply(df_list, function(x) {
   return(x)
 })
 
+# change alleles to lowercase in MoBa
+
 MoBa$A1 <- tolower(MoBa$A1)
 MoBa$A2 <- tolower(MoBa$A2)
+
+#create names for and change from df_list to dataframes in the global environment
 
 names(df_list) <- c("ALSPAC", "DNBC", "EFSOCH", "FS", "GENR", "GOYA_control_mothers", "GOYA_obese_children", "GOYA_obese_mothers", 
                       "GSAV2", "IHPS_casesCtrls_MEGAex", "IHPS_CIDR", "INMAGSA", "INMAOmni", "iPSYCH", "NFBC1966", "NFBC1986", 

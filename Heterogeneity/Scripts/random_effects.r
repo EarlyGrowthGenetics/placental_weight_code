@@ -17,13 +17,14 @@ for (file in txt_files) {
   assign(file_name, df)
 }
 
+# remove Meta analysis from the combined data as not wanted as part of the random effects meta
+
 combined_data <- combined_data %>% filter(study!="Meta")
 
 
 
 # Initialize empty dataframe to store results
 results_df <- data.frame(SNP = character(), Beta = numeric(), SE = numeric(), P =numeric())
-#, tau2 = numeric(), tau2_se = numeric(), tau = numeric(), I2 = numeric(), H2 = numeric(), Q = numeric(), Q_Pval = numeric()
 
 
 # Loop over variable x
@@ -96,6 +97,18 @@ cols_to_round <- c("Beta", "SE", "P", "Q", "Q_Pval")
 # Round specific columns in the data frame to 3 decimal places
 results_df[,cols_to_round] <- lapply(results_df[,cols_to_round], round, 3)
 
+# extract fixed effects results
+
+fe <-  fread('/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data/Meta.txt')
+
+fe <-  fe %>% select(SNP, BETA, SE, P, N) %>% rename(FE_BETA = BETA, FE_SE = SE, FE_P = P)
+
+results_df <- results_df %>% select(SNP, Beta, SE, P, Q, Q_Pval) %>% rename(RE_BETA = Beta, RE_SE = SE, RE_P = P)
+
+results_df <- inner_join(fe, results_df, by='SNP')
+
+results_df <- results_df %>% select("SNP", "FE_BETA", "FE_SE", "FE_P", "RE_BETA", "RE_SE", "RE_P", "Q", "Q_Pval", "N")
+  
 write.table(results_df, '/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data/Random_effects/Random_Effects_Results.txt',
             col.names=T, row.names=F, quote=F, sep='\t')
 

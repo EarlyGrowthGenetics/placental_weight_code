@@ -26,7 +26,7 @@ names(df_list) <- c("ALSPAC", "DNBC", "EFSOCH", "FS", "GENR", "GOYA_control_moth
                     "OPI", "PANIC", "RaineStudy", "Roskilde")
 
 
-# Load hetergeniety results from the meta
+# Load heterogeneity results from the meta
 
 ht <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data/het.csv')
 
@@ -46,7 +46,7 @@ df <- bind_rows(df_list)
 df$ci.lb <- df$BETA - 1.96*df$SE    # calculate lower bounds of 95% CI
 df$ci.ub <- df$BETA + 1.96*df$SE    # calculate upper bounds of 95% CI
 
-# merge the hetergeniety results into dataframe
+# merge the heterogeneity results into dataframe
 
 df <- inner_join(df, ht, by='SNP')
 
@@ -86,7 +86,7 @@ for (g in names(groups)) {
   assign(g, plot, envir = .GlobalEnv)
 }
 
-
+# combine plots
 plot1 <- rs1021508 + rs10486660 + rs10925945 + rs112635299 + rs11708067 + rs11756568 
 plot2 <- rs11866404 + rs12529634 + rs12543725 + rs138715366 + rs140691414 + rs1434836
 plot3 <- rs150138294 + rs1655296 + rs1801253 + rs2237892 + rs3822394 + rs4953353
@@ -96,6 +96,7 @@ plot6 <- rs7722058 + rs7783810 + rs876987 +rs9800506 + rs9817452 + plot_layout(n
 
 plots <- list(plot1, plot2, plot3, plot4, plot5, plot6)
 
+# save plots
 for (i in 1:length(plots)) { 
 ggsave(path = '/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data/Forest_plots',
        filename = paste0("top_hits_forest", i, ".png"),
