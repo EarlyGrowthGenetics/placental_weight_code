@@ -102,7 +102,7 @@ fp <- ggplot(data=df1,
   geom_hline(yintercept=0, lty=2) + 
   geom_vline(xintercept=vlines, lty=2) +
   xlab("") + 
-  ylab("Rg (95% C.I.)")  +
+  ylab("Rg with PW (95% C.I.)")  +
   theme_bw() 
 
 df1$n <- as.factor(df1$n)
