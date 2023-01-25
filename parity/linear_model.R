@@ -212,7 +212,7 @@ for (variant_id in variants_table$rsid) {
         startsWith(variant, variant_id)
       ) %>% 
       inner_join(
-        child_table,
+        pheno_table,
         by = "iid"
       )
     
@@ -362,7 +362,7 @@ for (variant_id in variants_table$rsid) {
         lm_results_summary_coefficients$variable <- row.names(lm_results_summary_coefficients)
         
         stratified_pw_lm_coefficients[[length(stratified_pw_lm_coefficients) + 1]] <- lm_results_summary_coefficients
-        
+
       }
     }
   }
