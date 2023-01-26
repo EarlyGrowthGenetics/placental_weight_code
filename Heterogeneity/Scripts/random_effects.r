@@ -108,7 +108,14 @@ results_df <- results_df %>% select(SNP, Beta, SE, P, Q, Q_Pval) %>% rename(RE_B
 results_df <- inner_join(fe, results_df, by='SNP')
 
 results_df <- results_df %>% select("SNP", "FE_BETA", "FE_SE", "FE_P", "RE_BETA", "RE_SE", "RE_P", "Q", "Q_Pval", "N")
-  
+
+# estimate the correlation between FE and RE Betas
+cor(results_df$FE_BETA, results_df$RE_BETA, method = c("pearson"))
+
+# determine the R2 from regressing one beta on the other
+lm <- lm(RE_BETA ~ FE_BETA, data=results_df)
+summary(lm)
+ 
 write.table(results_df, '/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data/Random_effects/Random_Effects_Results.txt',
             col.names=T, row.names=F, quote=F, sep='\t')
 
