@@ -26,6 +26,8 @@ combined_data <- combined_data %>% filter(study!="Meta")
 # Initialize empty dataframe to store results
 results_df <- data.frame(SNP = character(), Beta = numeric(), SE = numeric(), P =numeric())
 
+# define an empty list to store results
+res_list <- list()
 
 # Loop over variable x
 for (i in combined_data$SNP) {
@@ -36,8 +38,16 @@ for (i in combined_data$SNP) {
   dat_subset <- dat_subset[order(dat_subset$N, decreasing = FALSE),]
   
   # Fit random effects model
-  res <- rma(yi=BETA, vi=SE,  data=dat_subset, method="REML")
+  res <- rma(yi=BETA, sei=SE,  data=dat_subset, method="REML")
   
+  # check if tau2 is close to zero
+  if (abs(res$tau2) < 1e-10) {
+    # set tau2 = 0
+    res$tau2 <- 0
+  }
+  # store the results in a list
+  res_list[[i]] <- res
+
   # Plot forest plot
   forest_plot <- forest(res, slab = paste(unique(dat_subset$study)))
   
@@ -91,6 +101,9 @@ for (i in combined_data$SNP) {
 
 results_df <-  results_df %>% select(SNP, Beta, SE, P, Q, Q_Pval)
 
+results_df$pval <- format(results_df$P, scientific=TRUE)
+
+
 # Define the columns that you want to round
 cols_to_round <- c("Beta", "SE", "P", "Q", "Q_Pval")
 
@@ -108,6 +121,8 @@ results_df <- results_df %>% select(SNP, Beta, SE, P, Q, Q_Pval) %>% rename(RE_B
 results_df <- inner_join(fe, results_df, by='SNP')
 
 results_df <- results_df %>% select("SNP", "FE_BETA", "FE_SE", "FE_P", "RE_BETA", "RE_SE", "RE_P", "Q", "Q_Pval", "N")
+
+results_df$RE_P <- ifelse(results_df$RE_P == 0, "<0.001", results_df$RE_P)
 
 # estimate the correlation between FE and RE Betas
 cor(results_df$FE_BETA, results_df$RE_BETA, method = c("pearson"))
