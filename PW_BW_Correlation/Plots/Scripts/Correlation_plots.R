@@ -1,17 +1,19 @@
-
+library(here)
+library(R.utils)
 library(data.table)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(patchwork)
 
-df <- fread('BWT_Correlations/results/Combined_Results/combined_results.csv.gz')
 
-df <- mutate (df,
-      low = rg - (1.96*se), 
-      high= rg + (1.96*se),
-      h_low = h2_obs - (1.96*h2_obs_se), 
-      h_high= h2_obs + (1.96*h2_obs_se),
+df <- fread(file.path(here(), 'PW_BW_Correlation/Plots/Scripts/resources/combined_results.csv.gz'))
+
+df <- mutate(df,
+      low = rg - (qnorm(0.975)*se), 
+      high= rg + (qnorm(0.975)*se),
+      h_low = h2_obs - (qnorm(0.975)*h2_obs_se), 
+      h_high= h2_obs + (qnorm(0.975)*h2_obs_se),
     )
 
 

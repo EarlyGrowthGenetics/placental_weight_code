@@ -185,7 +185,7 @@ parity_lm_coefficients <- read.table(
   clean_names() %>% 
   mutate(
     individual = case_when(
-      individual == "child" ~ "Child",pain
+      individual == "child" ~ "Child",
       individual == "mother" ~ "Mother",
       individual == "father" ~ "Father"
     )
