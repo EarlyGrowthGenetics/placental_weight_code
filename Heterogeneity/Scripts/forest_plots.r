@@ -30,7 +30,7 @@ names(df_list) <- c("ALSPAC", "DNBC", "EFSOCH", "FS", "GENR", "GOYA_control_moth
 
 ht <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data/het.csv')
 
-ht <- ht %>% rename("L^2" = Isq,
+ht <- ht %>% rename("I^2" = Isq,
                     'Het P' = Het_P)
 
 
@@ -50,6 +50,8 @@ df$ci.ub <- df$BETA + 1.96*df$SE    # calculate upper bounds of 95% CI
 
 df <- inner_join(df, ht, by='SNP')
 
+# Make p values 3 decimal places
+
 df$'Het P' <- format(round(df$'Het P', 3), nsmall = 3)
 
 df$study <- recode(df$study, 'GOYA_control_mothers' = "GOYA_ctr_mum", 
@@ -66,7 +68,7 @@ a <- ifelse(df$study == "Meta"|df$study=="MoBa"|df$study=="iPSYCH", "red", "blac
 
 
 
-# loop through each group and create a forest plot after ordering the study by sample size
+# loop through each group and create a forest plot after ordering the studies on the y axis by sample size
 
 for (g in names(groups)) {
    plot <- ggplot(data = groups[[g]], aes(x = BETA, y = fct_reorder(study, N, .desc = TRUE), xmin = ci.lb, xmax = ci.ub, color = study)) +
@@ -74,7 +76,7 @@ for (g in names(groups)) {
     geom_hline(yintercept = 0, linetype = "dashed") +
     geom_vline(xintercept = 0) +
     ggtitle(paste0("", g, 
-                   paste0('    L2 = ', {groups[[g]]$'L^2'}), 
+                   paste0('    I2 = ', {groups[[g]]$'I^2'}), 
                    paste0(",   HET P = ", {groups[[g]]$'Het P'}))) +
     xlab("Beta (95% CI)") +
     ylab("Study") +
