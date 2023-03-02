@@ -2,6 +2,7 @@
 library(data.table)
 library(dplyr)
 library(ggplot2)
+library(tidyverse)
 library(patchwork)
 
 # Set the path to the folder containing the .txt files
@@ -63,8 +64,8 @@ df$study <- recode(df$study, 'GOYA_control_mothers' = "GOYA_ctr_mum",
 groups <- split(df, df$SNP)
 
 
-# make the labels for the meta, mob and ipsych red
-a <- ifelse(df$study == "Meta"|df$study=="MoBa"|df$study=="iPSYCH", "red", "black")
+# make the labels for the meta red
+a <- ifelse(df$study == "Meta", "red", "black")
 
 
 
@@ -82,7 +83,7 @@ for (g in names(groups)) {
     ylab("Study") +
     theme(axis.text.y = element_text(size = 10, face = "bold")) +
     theme(plot.title = element_text(size = 10, face = "bold")) +
-    scale_color_manual(values = c("Meta" = "red", "MoBa" = "red", "iPSYCH" = "red"),
+    scale_color_manual(values = c("Meta" = "red"),
                        guide = guide_legend(override.aes = list(size = 5))) +
     guides(color = "none")
   assign(g, plot, envir = .GlobalEnv)
