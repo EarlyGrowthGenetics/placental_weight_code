@@ -34,11 +34,10 @@ ht <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/Maternal/Clean/pw_m
 
 ht <- ht %>% rename(SNP = MarkerName)
 
-ht <- inner_join(SNP, ht, all=F) %>% filter(Effect != -0.0311) %>% select(SNP, HetISq, HetPVal)
+ht <- inner_join(SNP, ht) %>% filter(Effect != -0.0311) %>% select(SNP, HetISq, HetPVal)
 
 ht <- ht %>% rename("I^2" = HetISq,
                     'Het P' = HetPVal)
-
 
 # Iterate over the list of dataframes and create column called study to identify each study
 for (i in 1:length(df_list)) {
@@ -69,7 +68,6 @@ groups <- split(df, df$SNP)
 
 
 # loop through each group and create a forest plot after ordering the studies on the y axis by sample size
-
 for (g in names(groups)) {
   plot <- ggplot(data = groups[[g]], aes(x = BETA, y = fct_reorder(study, N, .desc = TRUE), xmin = ci.lb, xmax = ci.ub, color = study)) +
     geom_pointrange() +
@@ -85,7 +83,11 @@ for (g in names(groups)) {
     scale_y_discrete(labels = function(x) ifelse(x == "Meta", paste0("<span style='color:red'>", x, "</span>"), x)) +
     theme(axis.text.y = element_markdown(size = 10, face = "bold")) +
     theme(plot.title = element_text(size = 10, face = "bold")) +
-    guides(color = "none")
+    guides(color = "none") +
+    theme(panel.background = element_rect(fill = "white", color = NA),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
+  
   assign(g, plot, envir = .GlobalEnv)
 }
 
@@ -100,14 +102,14 @@ ggsave(
   width = 14.5, 
   height = 12, 
   dpi = 600,
-  path = "/home/christopher/Desktop/child_gest/LDSC_Files/Maternal/Cleaned_data/Forest_plots",
+  path = "/home/christopher/placental_weight_code/Heterogeneity/Maternal/Results/Meta_Analysis_Forest_Plots",
   device = "png"
 )
 
 
 
-df <- arrange(df, desc(SNP))
-
-write.table(df, '/home/christopher/Desktop/child_gest/LDSC_Files/Maternal/Cleaned_data/combined_data.txt', col.names=T, row.names=F, quote=F,sep='\t')
+# df <- arrange(df, desc(SNP))
+# 
+# write.table(df, '/home/christopher/Desktop/child_gest/LDSC_Files/Maternal/Cleaned_data/combined_data.txt', col.names=T, row.names=F, quote=F,sep='\t')
 
 

@@ -6,8 +6,11 @@ library(ggplot2)
 library(tidyr)
 library(patchwork)
 
-
-df <- fread(file.path(here(), 'PW_BW_Correlation/Plots/Scripts/resources/combined_results.csv.gz'))
+df <- fread(
+  file = file.path(here(), 'placental_weight_code/PW_BW_Correlation/Plots/Scripts/resources/combined_results.csv.gz'),
+  header = T,
+  sep = ","
+)
 
 df <- mutate(df,
       low = rg - (qnorm(0.975)*se), 
@@ -100,11 +103,11 @@ fp <- ggplot(data=df1,
   scale_color_manual(values = c("Fetal" = "#009E73",  
                                 "Maternal" = "#D55E00", 
                                 "Paternal" = "#0072B2"))  +
-  scale_fill_manual(values=c("grey85","cornsilk1")) +
+  scale_fill_manual(values=c("white","white")) +
   geom_hline(yintercept=0, lty=2) + 
   geom_vline(xintercept=vlines, lty=2) +
   xlab("") + 
-  ylab("Rg with PW (95% C.I.)")  +
+  ylab("Rg with Placental Weight (95% C.I.)")  +
   theme_bw() 
 
 df1$n <- as.factor(df1$n)
@@ -127,8 +130,8 @@ fp2 <- fp2 + theme(legend.text=element_text(size=16),
                    legend.title=element_text(size=16)) +
              theme(axis.title.y = element_text(size = 16, face="bold")) 
 
-png(file="PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.png",
-    width=900, height=500)
+figure_path <- file.path(here(), 'placental_weight_code/PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.png')
+png(figure_path, width = 900, height = 500)
 fp2
 dev.off()
 

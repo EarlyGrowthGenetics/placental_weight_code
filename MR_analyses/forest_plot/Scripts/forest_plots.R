@@ -41,6 +41,7 @@ df$Analysis[df$Analysis == "WLM"] <- "WLM-adjusted"
 
 ###### Plot
 
+
 forest_plot <- ggplot() + 
   geom_vline(
     xintercept = 0
@@ -73,8 +74,8 @@ forest_plot <- ggplot() +
     labeller = label_wrap_gen(
       width = 2,
       multi_line = T
-      )
-    ) +
+    )
+  ) +
   scale_x_continuous(
     name = "Effect Size [95% CI]"
   ) +
@@ -85,40 +86,44 @@ forest_plot <- ggplot() +
   ) +
   scale_color_manual(
     values = c("#009E73","#D55E00"),
-    guide = "none"
+    guides(color = guide_legend(override.aes=list(fill = NA, linetype = 0, size=1)),
+           shape = guide_legend(override.aes = list(linetype = 0)), 
+           fill = guide_legend(override.aes=list(linetype = c(1,1,1)))
     ) + 
-  theme_bw(
-      base_size = 24
-    ) + 
-  scale_shape(
-    guide = guide_legend(
-      override.aes = list(size = 5)
-    )
-  ) +
+      theme_bw(
+        base_size = 24
+      ) + 
+      scale_shape(
+        guide = guide_legend(
+          override.aes = list(linewidth = 5)
+        )
+      )
+  )
+
+
+# Modify the theme settings
+forest_plot <- forest_plot +
   theme(
-    panel.background = element_blank(),
-    panel.grid.major.y = element_blank(),
-    panel.grid.minor.y = element_blank(),
-    panel.grid.minor.x = element_blank(),
+    panel.background = element_rect(fill = "white"),  
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(), 
+    panel.border = element_rect(color = "black", fill = NA), 
+    strip.background = element_rect(color = "black", fill = NA),  
     axis.title.y = element_blank(),
-    axis.text.y.left = element_text(face = "bold"),
-    axis.text.x = element_text(face = "bold"),
-    legend.position = c(0.13, 0.96),
+    axis.text.y.left = element_text(face = "bold", size=24),
+    axis.text.x = element_text(face = "bold", size=24),
+    axis.title.x = element_text(face = "bold", size=24),
+    strip.text.y = element_text(face = "bold", size=24),
+    strip.placement = "outside",
     legend.title = element_blank(),
-    legend.background = element_rect(
-      fill = "white",
-      color = "grey20",
-      linewidth = 0.5
-    ),
-    legend.text = element_text(size = 18),
-    strip.text = element_text(size = 18, face = "bold"),
-    legend.margin = margin(t = -3, r = 2, b = 2, l = 2, unit = "mm")
-  ) 
+    legend.text=element_text(face = "bold", size=24)
+  )
+
 
 # save the plot
 
 figure_path <- file.path(here(), 'placental_weight_code/MR_analyses/forest_plot/Fig6_Mendelian_Randomization.png')
 png(figure_path, width = 900, height = 900)
 grid.draw(forest_plot)
-device <- dev.off()
+dev.off()
 

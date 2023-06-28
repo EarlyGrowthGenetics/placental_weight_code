@@ -66,7 +66,6 @@ groups <- split(df, df$SNP)
 
 
 # loop through each group and create a forest plot after ordering the studies on the y axis by sample size
-
 for (g in names(groups)) {
   plot <- ggplot(data = groups[[g]], aes(x = BETA, y = fct_reorder(study, N, .desc = TRUE), xmin = ci.lb, xmax = ci.ub, color = study)) +
     geom_pointrange() +
@@ -82,9 +81,14 @@ for (g in names(groups)) {
     scale_y_discrete(labels = function(x) ifelse(x == "Meta", paste0("<span style='color:red'>", x, "</span>"), x)) +
     theme(axis.text.y = element_markdown(size = 10, face = "bold")) +
     theme(plot.title = element_text(size = 10, face = "bold")) +
-    guides(color = "none")
+    guides(color = "none") +
+    theme(panel.background = element_rect(fill = "white", color = NA),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
+  
   assign(g, plot, envir = .GlobalEnv)
 }
+
 
 # combine plots
 plot1 <- rs1021508 + rs10486660 + rs10925945 + rs112635299 + rs11708067 + rs11756568 
@@ -98,7 +102,7 @@ plots <- list(plot1, plot2, plot3, plot4, plot5, plot6)
 
 # save plots
 for (i in 1:length(plots)) { 
-ggsave(path = '/home/christopher/Desktop/child_gest/LDSC_Files/Fetal/cleaned_data/Forest_plots',
+ggsave(path = '/home/christopher/placental_weight_code/Heterogeneity/Fetal/Results/Meta_Analysis_Forest_Plots',
        filename = paste0("top_hits_forest", i, ".png"),
        plot = plots[[i]], 
        width = 14.5, 
@@ -107,8 +111,8 @@ ggsave(path = '/home/christopher/Desktop/child_gest/LDSC_Files/Fetal/cleaned_dat
        dpi = 600)
 }
 
-df <- arrange(df, desc(SNP))
-
-write.table(df, '/home/christopher/Desktop/child_gest/LDSC_Files/Fetal/cleaned_data/combined_data.txt', col.names=T, row.names=F, quote=F,sep='\t')
-
+# df <- arrange(df, desc(SNP))
+# 
+# write.table(df, '/home/christopher/Desktop/child_gest/LDSC_Files/Fetal/cleaned_data/combined_data.txt', col.names=T, row.names=F, quote=F,sep='\t')
+# 
 
