@@ -5,8 +5,9 @@ library(tidyverse)
 library(patchwork)
 library(ggpubr)
 library(here)
+library(grid)
 
-meta <- fread('/Classification_Forest_plots/Data/meta_ga_results_pos_beta.csv.gz')
+meta <- fread(file.path(here(), 'Classification_Forest_Plots/Data/meta_ga_results_pos_beta.csv.gz'))
 
 metaf <- subset(meta, select=c("chr", "pos", "rsid", "beta_fetal", "se_fetal"))
 metam <- subset(meta, select=c("chr", "pos", "rsid", "beta_maternal", "se_maternal"))
@@ -36,7 +37,7 @@ metap$Person <- paste("Paternal")
 
 ###### Load WLM data
 
-wlm <- fread('/Classification_Forest_plots/Data/wlm_ga_results_pos_beta.csv.gz', sep="\t", head=TRUE)
+wlm <- fread(file.path(here(), 'Classification_Forest_Plots/Data/wlm_ga_results_pos_beta.csv.gz'), sep="\t", head=TRUE)
 
 
 wlmf <- subset(wlm, select=c("chr", "pos", "rsid", "wlm_beta_fetal", "wlm_se_fetal"))
@@ -157,13 +158,13 @@ spf1 <- spf1 + aes(x=Beta, xmin=Beta-1.96*se, xmax=Beta+1.96*se, y=Person, color
 spf1 <- spf1 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label_parsed)
 
 
-spf1 <- spf1 + geom_vline(xintercept=0) # add 0 line
+spf1 <- spf1 + geom_vline(xintercept=0,lty=2) # add 0 line
 
 spf1 <- spf1 + xlab("") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
         theme_bw() + theme(panel.background = element_rect(fill = "white"), 
                            panel.grid.major = element_blank(),  
-                           panel.grid.minor = element_blank(), 
-                           panel.grid.major.x=element_line(color ="gray73", linetype = "dashed")) +
+                           panel.grid.minor = element_blank()
+                           ) +
         theme(text = element_text(face = "bold", size=32, color = "black")) +
         theme(strip.text.y.right = element_text(angle=90, size=24)) +
         theme(axis.text.y.left = element_blank()) + 
@@ -233,13 +234,13 @@ spf2 <- spf2 + aes(x=Beta, xmin=Beta-1.96*se, xmax=Beta+1.96*se, y=Person, color
 
 spf2 <- spf2 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label_parsed)
 
-spf2 <- spf2 + geom_vline(xintercept=0) # add 0 line
+spf2 <- spf2 + geom_vline(xintercept=0,lty=2) # add 0 line
 
 spf2 <- spf2 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
   theme_bw() + theme(panel.background = element_rect(fill = "white"), 
                      panel.grid.major = element_blank(),  
-                     panel.grid.minor = element_blank(), 
-                     panel.grid.major.x=element_line(color ="gray73", linetype = "dashed")) +
+                     panel.grid.minor = element_blank()
+                     ) +
   theme(text = element_text(face = "bold", size=32, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=24)) +
   theme(axis.text.y.left = element_blank()) + 
@@ -311,13 +312,13 @@ spf3 <- spf3 + aes(x=Beta, xmin=Beta-1.96*se, xmax=Beta+1.96*se, y=Person, color
 
 spf3 <- spf3 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label_parsed)
 
-spf3 <- spf3 + geom_vline(xintercept=0) # add 0 line
+spf3 <- spf3 + geom_vline(xintercept=0,lty=2) # add 0 line
 
 spf3 <- spf3 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
   theme_bw() + theme(panel.background = element_rect(fill = "white"), 
                      panel.grid.major = element_blank(),  
-                     panel.grid.minor = element_blank(), 
-                     panel.grid.major.x=element_line(color ="gray73", linetype = "dashed")) +
+                     panel.grid.minor = element_blank()
+                     ) +
   theme(text = element_text(face = "bold", size=32, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=24)) +
   theme(axis.text.y.left = element_blank()) + 
@@ -386,8 +387,8 @@ spf4 <- spf4 + geom_vline(xintercept=0,lty=2) # add 0 line
 spf4 <- spf4 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
   theme_bw() + theme(panel.background = element_rect(fill = "white"), 
                      panel.grid.major = element_blank(),  
-                     panel.grid.minor = element_blank(), 
-                     panel.grid.major.x=element_line(color ="gray73", linetype = "dashed")) +
+                     panel.grid.minor = element_blank()
+                     ) +
   theme(text = element_text(face = "bold", size=32, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=24)) +
   theme(axis.text.y.left = element_blank()) + 
@@ -405,28 +406,45 @@ spf4 <- spf4 + theme(legend.box = "horizontal")
 
 leg <- as_ggplot(get_legend(spf4))
 
-spf4 <- spf4 + theme(legend.position="none")
+spf4 <- spf4 + theme(
+  legend.position="none", 
+  panel.border = element_blank(),
+  axis.line.x = element_line(color = 'black', linewidth = 0.5, linetype = 'solid')
+  )
 
 
 #### Combine the two plots for fetal
 
-spf1 <- spf1 + theme(legend.position="none")
+spf1 <- spf1 + theme(
+  legend.position="none", 
+  panel.border = element_blank(),
+  axis.line.x = element_line(color = 'black', linewidth = 0.5, linetype = 'solid')
+  )
 
-spf2 <- spf2 + theme(legend.position="none")
+spf2 <- spf2 + theme(
+  legend.position="none", 
+  panel.border = element_blank(),
+  axis.line.x = element_line(color = 'black', linewidth = 0.5, linetype = 'solid')
+  )
 
-spf3 <- spf3 + theme(legend.position="none")
+spf3 <- spf3 + theme(
+  legend.position="none", 
+  panel.border = element_blank(),
+  axis.line.x = element_line(color = 'black', linewidth = 0.5, linetype = 'solid')
+  )
+
 
 tf <- (spf1 + spf2 + spf3) / (spf4 + plot_spacer() + leg) + plot_layout(heights = unit(c(50, 13), c('cm')) )
 
 
-png("/placental_weight_code/Classification_Forest_Plots/Plots/Extended_Fig_3A_Fetal_Classified_Loci.png",
+png(file.path(here(), 'Classification_Forest_Plots/Plots/Extended_Fig_3A_Fetal_Classified_Loci.png'),
     res=800, width=50, height=70, units="cm")
-tf
+grid.draw(tf)
 dev.off()
 
-figure_path <- file.path(here(), 'placental_weight_code/Classification_Forest_Plots/Plots/Extended_Fig_3A_Fetal_Classified_Loci.eps')
+figure_path <- file.path(here(), 'Classification_Forest_Plots/Plots/Extended_Fig_3A_Fetal_Classified_Loci.eps')
 postscript(figure_path, width = 20, height = 28, horizontal = FALSE, onefile = FALSE, paper = "special")
-tf
+grid.draw(tf)
 dev.off()
 
 

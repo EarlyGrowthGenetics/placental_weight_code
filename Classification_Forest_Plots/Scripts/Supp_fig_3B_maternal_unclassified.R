@@ -5,8 +5,9 @@ library(data.table)
 library(tidyverse)
 library(patchwork)
 library(ggpubr)
+library(grid)
 
-meta <- fread('/Classification_Forest_plots/Data/meta_ga_results_pos_beta.csv.gz')
+meta <- fread(file.path(here(), 'Classification_Forest_Plots/Data/meta_ga_results_pos_beta.csv.gz'))
 
 metaf <- subset(meta, select=c("chr", "pos", "rsid", "beta_fetal", "se_fetal"))
 metam <- subset(meta, select=c("chr", "pos", "rsid", "beta_maternal", "se_maternal"))
@@ -36,7 +37,7 @@ metap$Person <- paste("Paternal")
 
 ###### Load WLM data
 
-wlm <- fread('/Classification_Forest_plots/Data/wlm_ga_results_pos_beta.csv.gz', sep="\t", head=TRUE)
+wlm <- fread(file.path(here(), 'Classification_Forest_Plots/Data/wlm_ga_results_pos_beta.csv.gz'), sep="\t", head=TRUE)
 
 
 wlmf <- subset(wlm, select=c("chr", "pos", "rsid", "wlm_beta_fetal", "wlm_se_fetal"))
@@ -147,18 +148,17 @@ levels(df1$gene) <- paste0("italic('", levels(df1$gene),"')")
 
 sp1 <- ggplot(df1, aes(Beta, Person)) 
 
-sp1 <- sp1 + geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, fill=Classification)) 
-
 sp1 <- sp1 + aes(x=Beta, xmin=Beta-1.96*se, xmax=Beta+1.96*se, y=Person, color=Genome) + geom_pointrange(aes(shape=Analysis), size = 1.5) 
 
 
 sp1 <- sp1 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label_parsed)
 
-sp1 <- sp1 + geom_vline(xintercept=0) # add 0 line
+sp1 <- sp1 + geom_vline(xintercept=0, linetype = "dashed") # add 0 line
 
 sp1 <- sp1 + xlab("") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
   scale_x_continuous(breaks=seq(-0.2,0.4,0.1)) +
-  theme_bw() + geom_vline(xintercept = seq(-0.2,0.4,0.1), color ="gray73", linetype = "dashed") +
+  theme_bw() + 
+  theme(panel.grid = element_blank()) +
   theme(text = element_text(face = "bold", size=36, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=28, face="bold")) +
   theme(axis.text.y.left = element_blank()) + 
@@ -200,18 +200,17 @@ levels(df2$gene) <- paste0("italic('", levels(df2$gene),"')")
 
 sp2 <- ggplot(df2, aes(Beta, Person)) 
 
-sp2 <- sp2 + geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, fill=Classification)) 
-
 sp2 <- sp2 + aes(x=Beta, xmin=Beta-1.96*se, xmax=Beta+1.96*se, y=Person, color=Genome) + geom_pointrange(aes(shape=Analysis), size = 1.5) 
 
 
 sp2 <- sp2 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label_parsed)
 
-sp2 <- sp2 + geom_vline(xintercept=0) # add 0 line
+sp2 <- sp2 + geom_vline(xintercept=0, linetype = "dashed") # add 0 line
 
 sp2 <- sp2 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
   scale_x_continuous(breaks=seq(-0.2,0.4,0.1)) +
-  theme_bw() + geom_vline(xintercept = seq(-0.2,0.4,0.1), color ="gray73", linetype = "dashed") +
+  theme_bw() + 
+  theme(panel.grid = element_blank()) +
   theme(text = element_text(face = "bold", size=36, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=28, face="bold")) +
   theme(axis.text.y.left = element_blank()) + 
@@ -255,18 +254,17 @@ levels(df3$gene) <- paste0("italic('", levels(df3$gene),"')")
 
 sp3 <- ggplot(df3, aes(Beta, Person)) 
 
-sp3 <- sp3 + geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, fill=Classification)) 
-
 sp3 <- sp3 + aes(x=Beta, xmin=Beta-1.96*se, xmax=Beta+1.96*se, y=Person, color=Genome) + geom_pointrange(aes(shape=Analysis), size = 1.5) 
 
 
 sp3 <- sp3 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label_parsed)
 
-sp3 <- sp3 + geom_vline(xintercept=0) # add 0 line
+sp3 <- sp3 + geom_vline(xintercept=0, linetype = "dashed") # add 0 line
 
 sp3 <- sp3 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
   scale_x_continuous(breaks=seq(-0.2,0.4,0.1)) +
-  theme_bw() + geom_vline(xintercept = seq(-0.2,0.4,0.1), color ="gray73", linetype = "dashed") +
+  theme_bw() + 
+  theme(panel.grid = element_blank()) +
   theme(text = element_text(face = "bold", size=36, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=28, face="bold")) +
   theme(axis.text.y.left = element_blank()) + 
@@ -287,9 +285,21 @@ sp2 <- sp2 + theme(legend.box = "horizontal")
 
 leg <- as_ggplot(get_legend(sp2))
 
-sp1 <- sp1 + theme(legend.position="none")
-sp2 <- sp2 + theme(legend.position="none")
-sp3 <- sp3 + theme(legend.position="none")
+sp1 <- sp1 + theme(
+  legend.position="none", 
+  panel.border = element_blank(),
+  axis.line.x = element_line(color = 'black', linewidth = 0.5, linetype = 'solid')
+)
+sp2 <- sp2 + theme(
+  legend.position="none", 
+  panel.border = element_blank(),
+  axis.line.x = element_line(color = 'black', linewidth = 0.5, linetype = 'solid')
+)
+sp3 <- sp3 + theme(
+  legend.position="none", 
+  panel.border = element_blank(),
+  axis.line.x = element_line(color = 'black', linewidth = 0.5, linetype = 'solid')
+)
 
 
 layout <- c(area(1,1),
@@ -302,15 +312,15 @@ layout <- c(area(1,1),
 tf <- (leg/sp1/sp2) + sp3 + plot_layout(design=layout)
 
 
-png("/placental_weight_code/Classification_Forest_Plots/Plots/SuppFig_3B_Classifications of remaining Loci.png",
+png(file.path(here(), 'Classification_Forest_Plots/Plots/Extended_3B_Classifications of remaining Loci.png'),
     res=600, width=55, height=65, units="cm")
-tf
+grid.draw(tf)
 dev.off()
 
 
-figure_path <- file.path(here(), 'placental_weight_code/Classification_Forest_Plots/Plots/SuppFig_3B_Classifications.eps')
+figure_path <- file.path(here(), 'Classification_Forest_Plots/Plots/Extended_3B_Classifications.eps')
 postscript(figure_path, width = 20, height = 28, horizontal = FALSE, onefile = FALSE, paper = "special")
-tf
+grid.draw(tf)
 dev.off()
 
 

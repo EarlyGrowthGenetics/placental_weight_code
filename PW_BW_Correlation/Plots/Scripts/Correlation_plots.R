@@ -5,9 +5,10 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(patchwork)
+library(grid)
 
 df <- fread(
-  file = file.path(here(), 'placental_weight_code/PW_BW_Correlation/Plots/Scripts/resources/combined_results.csv.gz'),
+  file = file.path(here(), 'PW_BW_Correlation/Plots/Scripts/resources/combined_results.csv.gz'),
   header = T,
   sep = ","
 )
@@ -130,12 +131,12 @@ fp2 <- fp2 + theme(legend.text=element_text(size=16),
                    legend.title=element_text(size=16)) +
              theme(axis.title.y = element_text(size = 16, face="bold")) 
 
-figure_path <- file.path(here(), 'placental_weight_code/PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.png')
+figure_path <- file.path(here(), 'PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.png')
 png(figure_path, width = 900, height = 500)
 fp2
 dev.off()
 
-figure_path <- file.path(here(), 'placental_weight_code/PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.eps')
+figure_path <- file.path(here(), 'PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.eps')
 postscript(figure_path, width = 13, height = 13, horizontal = FALSE, onefile = FALSE, paper = "special")
 grid.draw(fp2)
 dev.off()
