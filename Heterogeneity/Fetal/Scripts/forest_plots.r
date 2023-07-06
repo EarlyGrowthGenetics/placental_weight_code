@@ -7,7 +7,7 @@ library(tidyverse)
 library(patchwork)
 
 # Set the path to the folder containing the .txt files
-path <- '/home/christopher/Desktop/child_gest/LDSC_Files/Fetal/cleaned_data'
+path <- '/child_gest/LDSC_Files/Fetal/cleaned_data'
 
 # Get a list of all .txt files in the folder
 txt_files <- list.files(path, pattern = "\\.txt$", full.names = TRUE)
@@ -30,7 +30,7 @@ names(df_list) <- c("ALSPAC", "DNBC", "EFSOCH", "FS", "GENR", "GOYA_control_moth
 
 # Load heterogeneity results from the meta
 
-ht <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/Fetal/cleaned_data/het.csv')
+ht <- fread('/child_gest/LDSC_Files/Fetal/cleaned_data/het.csv')
 
 ht <- ht %>% rename("I^2" = Isq,
                     'Het P' = Het_P)
@@ -138,6 +138,6 @@ for (i in 1:length(plots)) {
 
 # df <- arrange(df, desc(SNP))
 # 
-# write.table(df, '/home/christopher/Desktop/child_gest/LDSC_Files/Fetal/cleaned_data/combined_data.txt', col.names=T, row.names=F, quote=F,sep='\t')
+# write.table(df, '/child_gest/LDSC_Files/Fetal/cleaned_data/combined_data.txt', col.names=T, row.names=F, quote=F,sep='\t')
 # 
 

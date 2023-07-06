@@ -7,7 +7,7 @@ library(tidyverse)
 library(patchwork)
 
 # Set the path to the folder containing the .txt files
-path <- '/home/christopher/Desktop/child_gest/LDSC_Files/Maternal/Cleaned_data'
+path <- '/child_gest/LDSC_Files/Maternal/Cleaned_data'
 
 # Get a list of all .txt files in the folder
 txt_files <- list.files(path, pattern = "\\.txt$", full.names = TRUE)
@@ -30,7 +30,7 @@ SNP <- Meta %>% select(SNP)
 
 # Load meta results and extract heterogeneity results from the meta
 
-ht <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/Maternal/Clean/pw_maternal_sex_gest.gz')
+ht <- fread('/child_gest/LDSC_Files/Maternal/Clean/pw_maternal_sex_gest.gz')
 
 ht <- ht %>% rename(SNP = MarkerName)
 
@@ -110,6 +110,6 @@ ggsave(
 
 # df <- arrange(df, desc(SNP))
 # 
-# write.table(df, '/home/christopher/Desktop/child_gest/LDSC_Files/Maternal/Cleaned_data/combined_data.txt', col.names=T, row.names=F, quote=F,sep='\t')
+# write.table(df, '/child_gest/LDSC_Files/Maternal/Cleaned_data/combined_data.txt', col.names=T, row.names=F, quote=F,sep='\t')
 
 

@@ -9,7 +9,7 @@ library(ggplot2)
 
 # load paternal meta summary stats
 
-Meta <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/Paternal/Clean/pw_paternal_sex_gest.gz')
+Meta <- fread('/child_gest/LDSC_Files/Paternal/Clean/pw_paternal_sex_gest.gz')
 
 # create marker column
 
@@ -30,7 +30,7 @@ Meta <- Meta %>% rename(
 
 # load top hits and filter out chr 22 where needed (has the same position and identified using grep merge will double check every variant)
 
-th <- fread('/home/christopher/Desktop/child_gest/LDSC_Files/paternal_top.csv', header=F)
+th <- fread('/child_gest/LDSC_Files/paternal_top.csv', header=F)
 
 th <- th %>% rename(marker = V1)
 
@@ -41,7 +41,7 @@ Meta <- inner_join(Meta, th, by = 'marker')
 MEta <- Meta %>% select("SNP", "A1", "A2", "FRQ", "BETA", "SE", "P", "N")
 
 # Set the path to the folder containing the .txt files
-path <- '/home/christopher/Desktop/child_gest/LDSC_Files/Paternal/top_hits_files'
+path <- '/child_gest/LDSC_Files/Paternal/top_hits_files'
 
 # Get a list of all .txt files in the folder
 txt_files <- list.files(path, pattern = "\\.txt$", full.names = TRUE)
@@ -198,7 +198,7 @@ lapply(seq_along(df_list), function(i){
   # Extract the name of the dataframe
   df_name <- names(df_list)[i]
   # Write the dataframe to a .csv file in the specified folder
-  write.table(df_list[[i]], file = paste0('/home/christopher/Desktop/child_gest/LDSC_Files/Paternal/Cleaned_data', '/', df_name, '.txt'),sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+  write.table(df_list[[i]], file = paste0('/child_gest/LDSC_Files/Paternal/Cleaned_data', '/', df_name, '.txt'),sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 })
 
 

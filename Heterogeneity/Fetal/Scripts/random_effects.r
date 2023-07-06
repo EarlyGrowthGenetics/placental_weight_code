@@ -5,7 +5,7 @@ library(metafor)
 library(ggplot2)
 
 # Set the path to the folder containing the .txt files
-path <- '/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data'
+path <- '/child_gest/LDSC_Files/cleaned_data'
 
 # Get a list of all .txt files in the folder
 txt_files <- list.files(path, pattern = "\\.txt$", full.names = TRUE)
@@ -52,7 +52,7 @@ for (i in combined_data$SNP) {
   forest_plot <- forest(res, slab = paste(unique(dat_subset$study)))
   
   # Save forest plot as png file
-  pdf(file=paste0("/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data/Random_effects/Forest_plots/forest_plot_", i, ".pdf"))
+  pdf(file=paste0("/child_gest/LDSC_Files/cleaned_data/Random_effects/Forest_plots/forest_plot_", i, ".pdf"))
   forest(res, slab = paste(unique(dat_subset$study)))
   dev.off() 
   
@@ -60,7 +60,7 @@ for (i in combined_data$SNP) {
   funnel_plot <- funnel(res)
  
   # Save funnel plot as png file
-  pdf(file=paste0("/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data/Random_effects/Funnel_plots/funnel_plot_", i, ".pdf"))
+  pdf(file=paste0("/child_gest/LDSC_Files/cleaned_data/Random_effects/Funnel_plots/funnel_plot_", i, ".pdf"))
   funnel(res)
   dev.off()
 
@@ -112,7 +112,7 @@ results_df[,cols_to_round] <- lapply(results_df[,cols_to_round], round, 3)
 
 # extract fixed effects results
 
-fe <-  fread('/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data/Meta.txt')
+fe <-  fread('/child_gest/LDSC_Files/cleaned_data/Meta.txt')
 
 fe <-  fe %>% select(SNP, BETA, SE, P, N) %>% rename(FE_BETA = BETA, FE_SE = SE, FE_P = P)
 
@@ -131,7 +131,7 @@ cor(results_df$FE_BETA, results_df$RE_BETA, method = c("pearson"))
 lm <- lm(RE_BETA ~ FE_BETA, data=results_df)
 summary(lm)
  
-write.table(results_df, '/home/christopher/Desktop/child_gest/LDSC_Files/cleaned_data/Random_effects/Random_Effects_Results.txt',
+write.table(results_df, '/child_gest/LDSC_Files/cleaned_data/Random_effects/Random_Effects_Results.txt',
             col.names=T, row.names=F, quote=F, sep='\t')
 
 
