@@ -127,3 +127,12 @@ png(figure_path, width = 900, height = 900)
 grid.draw(forest_plot)
 dev.off()
 
+figure_path <- file.path(here(), 'placental_weight_code/MR_analyses/forest_plot/Fig6_Mendelian_Randomization.eps')
+postscript(figure_path, width = 13, height = 13, horizontal = FALSE, onefile = FALSE, paper = "special")
+grid.draw(forest_plot)
+dev.off()
+
+
+
+
+

@@ -4,8 +4,9 @@ library(data.table)
 library(tidyverse)
 library(patchwork)
 library(ggpubr)
+library(here)
 
-meta <- fread('meta/Classification_Forest_plots/Data/meta_ga_results_pos_beta.csv')
+meta <- fread('/Classification_Forest_plots/Data/meta_ga_results_pos_beta.csv.gz')
 
 metaf <- subset(meta, select=c("chr", "pos", "rsid", "beta_fetal", "se_fetal"))
 metam <- subset(meta, select=c("chr", "pos", "rsid", "beta_maternal", "se_maternal"))
@@ -35,7 +36,7 @@ metap$Person <- paste("Paternal")
 
 ###### Load WLM data
 
-wlm <- fread('meta/Classification_Forest_plots/Data/wlm_ga_results_pos_beta.csv', sep=",", head=TRUE)
+wlm <- fread('/Classification_Forest_plots/Data/wlm_ga_results_pos_beta.csv.gz', sep="\t", head=TRUE)
 
 
 wlmf <- subset(wlm, select=c("chr", "pos", "rsid", "wlm_beta_fetal", "wlm_se_fetal"))
@@ -152,16 +153,17 @@ spf1 <- ggplot(dff1, aes(Beta, Person))
 
 spf1 <- spf1 + aes(x=Beta, xmin=Beta-1.96*se, xmax=Beta+1.96*se, y=Person, color=Genome) + geom_pointrange(aes(shape=Analysis), size = 1.5)  +
                 xlim(-0.08,0.225) 
-            
+
 spf1 <- spf1 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label_parsed)
 
 
 spf1 <- spf1 + geom_vline(xintercept=0) # add 0 line
 
-spf1 <- spf1 + xlab("") + ylab("") + 
-        theme_bw() + theme(panel.background = element_rect(fill = "honeydew2"), 
-                           panel.grid.major.x=element_line(color ="gray30", linetype = "dashed")) +
-        scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
+spf1 <- spf1 + xlab("") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
+        theme_bw() + theme(panel.background = element_rect(fill = "white"), 
+                           panel.grid.major = element_blank(),  
+                           panel.grid.minor = element_blank(), 
+                           panel.grid.major.x=element_line(color ="gray73", linetype = "dashed")) +
         theme(text = element_text(face = "bold", size=32, color = "black")) +
         theme(strip.text.y.right = element_text(angle=90, size=24)) +
         theme(axis.text.y.left = element_blank()) + 
@@ -169,22 +171,11 @@ spf1 <- spf1 + xlab("") + ylab("") +
         theme(legend.key = element_rect(fill = "white", colour = "black")) +
         guides(color = guide_legend(override.aes=list(fill = NA, linetype = 0, size=1)),
                shape = guide_legend(override.aes = list(linetype = 0)), 
-               fill = guide_legend(override.aes=list(linetype = c(1,1,1)))) +
+               fill = "none") +
+        theme(strip.background = element_rect(fill = "white", color = "black")) +
         theme(legend.key.size = unit(1.5, 'cm')) +
         theme(legend.text = element_text(size=20))
   
-
-
-
-# save the plot
-
-
-png("meta/conditional_analysis/Forest_plots/Plots/fetal_1.png",
-    width=900, height=1500)
-spf1
-dev.off()
-
-
 
 ############## Fetal Plots - second 13
 
@@ -244,10 +235,11 @@ spf2 <- spf2 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label
 
 spf2 <- spf2 + geom_vline(xintercept=0) # add 0 line
 
-spf2 <- spf2 + xlab("Effect Size") + ylab("") + 
-  theme_bw() + theme(panel.background = element_rect(fill = "honeydew2"), 
-                     panel.grid.major.x=element_line(color ="gray30", linetype = "dashed")) +
-  scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
+spf2 <- spf2 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
+  theme_bw() + theme(panel.background = element_rect(fill = "white"), 
+                     panel.grid.major = element_blank(),  
+                     panel.grid.minor = element_blank(), 
+                     panel.grid.major.x=element_line(color ="gray73", linetype = "dashed")) +
   theme(text = element_text(face = "bold", size=32, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=24)) +
   theme(axis.text.y.left = element_blank()) + 
@@ -255,20 +247,10 @@ spf2 <- spf2 + xlab("Effect Size") + ylab("") +
   theme(legend.key = element_rect(fill = "white", colour = "black")) +
   guides(color = guide_legend(override.aes=list(fill = NA, linetype = 0, size=1)),
          shape = guide_legend(override.aes = list(linetype = 0)), 
-         fill = guide_legend(override.aes=list(linetype = c(1,1,1)))) +
+         fill = "none") +
+  theme(strip.background = element_rect(fill = "white", color = "black")) +
   theme(legend.key.size = unit(1.5, 'cm')) +
   theme(legend.text = element_text(size=20))
-
-spf2
-
-
-# save the plot
-
-
-png("meta/conditional_analysis/Forest_plots/Plots/fetal_2.png",
-    width=900, height=1500)
-spf2
-dev.off()
 
 
 ############## Fetal Plots - third 8
@@ -331,10 +313,11 @@ spf3 <- spf3 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label
 
 spf3 <- spf3 + geom_vline(xintercept=0) # add 0 line
 
-spf3 <- spf3 + xlab("Effect Size") + ylab("") + 
-  theme_bw() + theme(panel.background = element_rect(fill = "honeydew2"), 
-                     panel.grid.major.x=element_line(color ="gray30", linetype = "dashed")) +
-  scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
+spf3 <- spf3 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
+  theme_bw() + theme(panel.background = element_rect(fill = "white"), 
+                     panel.grid.major = element_blank(),  
+                     panel.grid.minor = element_blank(), 
+                     panel.grid.major.x=element_line(color ="gray73", linetype = "dashed")) +
   theme(text = element_text(face = "bold", size=32, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=24)) +
   theme(axis.text.y.left = element_blank()) + 
@@ -342,23 +325,13 @@ spf3 <- spf3 + xlab("Effect Size") + ylab("") +
   theme(legend.key = element_rect(fill = "white", colour = "black")) +
   guides(color = guide_legend(override.aes=list(fill = NA, linetype = 0, size=1)),
          shape = guide_legend(override.aes = list(linetype = 0)), 
-         fill = guide_legend(override.aes=list(linetype = c(1,1,1)))) +
+         fill = "none") +
+  theme(strip.background = element_rect(fill = "white", color = "black")) +
   theme(legend.key.size = unit(1.5, 'cm')) +
   theme(legend.text = element_text(size=20))
 
+
 spf3
-
-
-# save the plot
-
-
-png("meta/conditional_analysis/Forest_plots/Plots/fetal_3.png",
-    width=900, height=1500)
-spf3
-dev.off()
-
-
-
 
 
 
@@ -379,7 +352,7 @@ nudt$Genome[(grepl('Maternal', nudt$Person))] <- "Maternal"
 nudt$Genome[(grepl('Paternal', nudt$Person))] <- "Paternal"
 
 
-nudt$rsid <- factor(nudt$rsid, levels=c("rs140691414","rs541641049",))
+nudt$rsid <- factor(nudt$rsid, levels=c("rs140691414","rs541641049"))
 
 nudt$gene[nudt$rsid=="rs541641049"] <- "NUDT3"
 nudt$gene[nudt$rsid=="rs140691414"] <- "TSNAX-DISC1"
@@ -410,10 +383,11 @@ spf4 <- spf4 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label
 
 spf4 <- spf4 + geom_vline(xintercept=0,lty=2) # add 0 line
 
-spf4 <- spf4 + xlab("Effect Size") + ylab("") + 
-  theme_bw() + theme(panel.background = element_rect(fill = "honeydew2"),
-                     panel.grid.major.x=element_line(color ="gray30", linetype = "dashed")) +
-  scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
+spf4 <- spf4 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
+  theme_bw() + theme(panel.background = element_rect(fill = "white"), 
+                     panel.grid.major = element_blank(),  
+                     panel.grid.minor = element_blank(), 
+                     panel.grid.major.x=element_line(color ="gray73", linetype = "dashed")) +
   theme(text = element_text(face = "bold", size=32, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=24)) +
   theme(axis.text.y.left = element_blank()) + 
@@ -421,25 +395,17 @@ spf4 <- spf4 + xlab("Effect Size") + ylab("") +
   theme(legend.key = element_rect(fill = "white", colour = "black")) +
   guides(color = guide_legend(override.aes=list(fill = NA, linetype = 0, size=1)),
          shape = guide_legend(override.aes = list(linetype = 0)), 
-         fill = guide_legend(override.aes=list(linetype = c(1,1,1)))) +
+         fill = "none") +
+  theme(strip.background = element_rect(fill = "white", color = "black")) +
   theme(legend.key.size = unit(1.5, 'cm')) +
-  theme(legend.text = element_text(size=36))
+  theme(legend.text = element_text(size=28))
+
 
 spf4 <- spf4 + theme(legend.box = "horizontal")
 
 leg <- as_ggplot(get_legend(spf4))
 
 spf4 <- spf4 + theme(legend.position="none")
-
-# save the plot
-
-
-png("meta/conditional_analysis/Forest_plots/Plots/fetal_nudt3.png",
-     width=900, height=300)
-spf4
-dev.off()
-
-
 
 
 #### Combine the two plots for fetal
@@ -452,7 +418,15 @@ spf3 <- spf3 + theme(legend.position="none")
 
 tf <- (spf1 + spf2 + spf3) / (spf4 + plot_spacer() + leg) + plot_layout(heights = unit(c(50, 13), c('cm')) )
 
-png("Classification_Forest_plots/Plots/SuppFig_3A_Fetal Classified Loci.png",
-    res=300, width=55, height=70, units="cm")
+
+png("/placental_weight_code/Classification_Forest_Plots/Plots/Extended_Fig_3A_Fetal_Classified_Loci.png",
+    res=800, width=50, height=70, units="cm")
 tf
 dev.off()
+
+figure_path <- file.path(here(), 'placental_weight_code/Classification_Forest_Plots/Plots/Extended_Fig_3A_Fetal_Classified_Loci.eps')
+postscript(figure_path, width = 20, height = 28, horizontal = FALSE, onefile = FALSE, paper = "special")
+tf
+dev.off()
+
+

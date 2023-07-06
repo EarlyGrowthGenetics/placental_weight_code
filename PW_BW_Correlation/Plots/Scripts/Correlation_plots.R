@@ -135,5 +135,10 @@ png(figure_path, width = 900, height = 500)
 fp2
 dev.off()
 
+figure_path <- file.path(here(), 'placental_weight_code/PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.eps')
+postscript(figure_path, width = 13, height = 13, horizontal = FALSE, onefile = FALSE, paper = "special")
+grid.draw(fp2)
+dev.off()
+
 
 

@@ -101,6 +101,18 @@ plot6 <- rs7722058 + rs7783810 + rs876987 +rs9800506 + rs9817452 + plot_layout(n
 plots <- list(plot1, plot2, plot3, plot4, plot5, plot6)
 
 # save plots
+for (i in 1:length(plots)) {
+  ggsave(
+    filename = paste0("/home/christopher/placental_weight_code/Heterogeneity/Fetal/Results/Meta_Analysis_Forest_Plots/top_hits_forest", i, ".pdf"),
+    plot = plots[[i]],
+    width = 14.5,
+    height = 12,
+    device = "pdf",
+    dpi = 600
+  )
+}
+
+
 for (i in 1:length(plots)) { 
 ggsave(path = '/home/christopher/placental_weight_code/Heterogeneity/Fetal/Results/Meta_Analysis_Forest_Plots',
        filename = paste0("top_hits_forest", i, ".png"),
@@ -108,8 +120,21 @@ ggsave(path = '/home/christopher/placental_weight_code/Heterogeneity/Fetal/Resul
        width = 14.5, 
        height = 12, 
        device = "png", 
-       dpi = 600)
+       dpi = 900)
 }
+
+for (i in 1:length(plots)) {
+  ggsave(
+    filename = paste0("top_hits_forest", i, ".eps"),
+    plot = plots[[i]],
+    width = 14.5,
+    height = 12,
+    device = "eps",
+    dpi = 600,
+    path = '/home/christopher/placental_weight_code/Heterogeneity/Fetal/Results/Meta_Analysis_Forest_Plots'
+  )
+}
+
 
 # df <- arrange(df, desc(SNP))
 # 

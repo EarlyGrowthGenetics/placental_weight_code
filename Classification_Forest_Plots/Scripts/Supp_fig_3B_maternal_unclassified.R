@@ -1,12 +1,12 @@
 
-
+library(here)
 library(dplyr)
 library(data.table)
 library(tidyverse)
 library(patchwork)
 library(ggpubr)
 
-meta <- fread('meta/Classification_Forest_plots/Data/meta_ga_results_pos_beta.csv')
+meta <- fread('/Classification_Forest_plots/Data/meta_ga_results_pos_beta.csv.gz')
 
 metaf <- subset(meta, select=c("chr", "pos", "rsid", "beta_fetal", "se_fetal"))
 metam <- subset(meta, select=c("chr", "pos", "rsid", "beta_maternal", "se_maternal"))
@@ -36,7 +36,7 @@ metap$Person <- paste("Paternal")
 
 ###### Load WLM data
 
-wlm <- fread('meta/Classification_Forest_plots/Data/wlm_ga_results_pos_beta.csv', sep=",", head=TRUE)
+wlm <- fread('/Classification_Forest_plots/Data/wlm_ga_results_pos_beta.csv.gz', sep="\t", head=TRUE)
 
 
 wlmf <- subset(wlm, select=c("chr", "pos", "rsid", "wlm_beta_fetal", "wlm_se_fetal"))
@@ -116,16 +116,16 @@ df$Classification[df$rsid=="rs150138294"|df$rsid=="rs10925945"|df$rsid=="rs49533
 
 df$Classification <- factor(df$Classification, levels = c("Maternal", "Fetal & Maternal", "Unclassified"))
 
-df1 <- df %>% filter(Classification=="Maternal"|Classification=="Fetal & Maternal")
+df1 <- df %>% filter(Classification=="Maternal")
 
-df2 <- df %>% filter(Classification=="Unclassified")
+df2 <- df %>% filter(Classification=="Fetal & Maternal")
+
+df3 <- df %>% filter(Classification=="Unclassified")
 
 
-df1$rsid <- factor(df1$rsid, levels=c("rs72804545","rs2168101","rs180435","rs303998",
-                                    "rs11708067","rs138715366","rs2237892"))
+df1$rsid <- factor(df1$rsid, levels=c("rs72804545","rs2168101","rs180435","rs303998"))
 
-df1$gene <- factor(df1$gene, levels=c("EBF1","LMO1","SLC38A4","NLRP13",
-                                    "ADCY5","YKT6","KCNQ1"))
+df1$gene <- factor(df1$gene, levels=c("EBF1","LMO1","SLC38A4","NLRP13"))
   
   
 
@@ -156,42 +156,30 @@ sp1 <- sp1 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label_p
 
 sp1 <- sp1 + geom_vline(xintercept=0) # add 0 line
 
-sp1 <- sp1 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
+sp1 <- sp1 + xlab("") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
   scale_x_continuous(breaks=seq(-0.2,0.4,0.1)) +
-  theme_bw() + geom_vline(xintercept = seq(-0.2,0.4,0.1), color ="gray30", linetype = "dashed") +
+  theme_bw() + geom_vline(xintercept = seq(-0.2,0.4,0.1), color ="gray73", linetype = "dashed") +
   theme(text = element_text(face = "bold", size=36, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=28, face="bold")) +
   theme(axis.text.y.left = element_blank()) + 
   theme(axis.ticks.y.left = element_blank()) +
-  scale_fill_manual(values = c("Maternal" = "linen","Fetal & Maternal" = "grey90","Unclassified" = "lavenderblush1")) +
+  scale_fill_manual(values = c("Maternal" = "white")) +
   theme(legend.key = element_rect(fill = "white", colour = "black")) +
-  guides(color = guide_legend(override.aes=list(fill = NA, linetype = 0, size=1)),
-         shape = guide_legend(override.aes = list(linetype = 0)), 
-         fill = guide_legend(override.aes=list(linetype = c(1,1,1)))) +
+  guides(color = guide_legend(override.aes=list(fill = NA)),
+         shape = guide_legend(override.aes = list(linetype = 0)),
+         fill = "none") + 
+  theme(strip.background = element_rect(fill = "white", color = "black")) +
   theme(legend.key.size = unit(1.5, 'cm')) +
-  theme(legend.text = element_text(size=24))
+  theme(legend.text = element_text(size=34)) +
+  labs(title = "Maternal")
 
 
+##### Maternal-fetal classification plot
 
+df2$rsid <- factor(df2$rsid, levels=c("rs11708067","rs138715366","rs2237892"))
 
-# save the plot
+df2$gene <- factor(df2$gene, levels=c("ADCY5","YKT6","KCNQ1"))
 
-
-png("meta/conditional_analysis/Forest_plots/Plots/maternal_mat-fet.png",
-    width=900, height=1600)
-sp1
-dev.off()
-
-
-
-##### Unclassified plot
-
-
-df2$rsid <- factor(df2$rsid, levels=c("rs150138294","rs10925945","rs4953353","rs74457440",
-                                     "rs75512885","rs9800506","rs12543725","rs7177338"))
-
-df2$gene <- factor(df2$gene, levels=c("DCST2","CHRM3","EPAS1","PDLIM5",
-                                    "EBF1","FKBP5","SLC45A4","FES"))
 
 
 #### Order data for plots
@@ -223,29 +211,77 @@ sp2 <- sp2 + geom_vline(xintercept=0) # add 0 line
 
 sp2 <- sp2 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
   scale_x_continuous(breaks=seq(-0.2,0.4,0.1)) +
-  theme_bw() + geom_vline(xintercept = seq(-0.2,0.4,0.1), color ="gray30", linetype = "dashed") +
+  theme_bw() + geom_vline(xintercept = seq(-0.2,0.4,0.1), color ="gray73", linetype = "dashed") +
   theme(text = element_text(face = "bold", size=36, color = "black")) +
   theme(strip.text.y.right = element_text(angle=90, size=28, face="bold")) +
   theme(axis.text.y.left = element_blank()) + 
   theme(axis.ticks.y.left = element_blank()) +
-  scale_fill_manual(values = c("Maternal" = "linen","Fetal & Maternal" = "grey90","Unclassified" = "lavenderblush1")) +
+  scale_fill_manual(values = c("Fetal & Maternal" = "white")) +
   theme(legend.key = element_rect(fill = "white", colour = "black")) +
   guides(color = guide_legend(override.aes=list(fill = NA, linetype = 0, size=1)),
          shape = guide_legend(override.aes = list(linetype = 0)), 
-         fill = guide_legend(override.aes=list(linetype = c(1,1,1)))) +
+         fill = "none") +
+  theme(strip.background = element_rect(fill = "white", color = "black")) +
   theme(legend.key.size = unit(1.5, 'cm')) +
-  theme(legend.text = element_text(size=26))
+  theme(legend.text = element_text(size=34)) +
+  labs(title = "Fetal & Maternal")
 
 
+##### Unclassified plot
 
-# save the plot
+
+df3$rsid <- factor(df3$rsid, levels=c("rs150138294","rs10925945","rs4953353","rs74457440",
+                                     "rs75512885","rs9800506","rs12543725","rs7177338"))
+
+df3$gene <- factor(df3$gene, levels=c("DCST2","CHRM3","EPAS1","PDLIM5",
+                                    "EBF1","FKBP5","SLC45A4","FES"))
 
 
-png("meta/conditional_analysis/Forest_plots/Plots/unclass.png",
-    width=900, height=1600)
-sp2
-dev.off()
+#### Order data for plots
 
+df3 <- df3 %>% arrange(rsid, Genome, Analysis)
+
+df3$Person <- factor(df3$Person, levels = rev(unique(df3$Person)))
+
+
+#### Italicize the gene names from "gene"
+
+
+levels(df3$gene) <- paste0("italic('", levels(df3$gene),"')")
+
+
+##### Plot data
+
+
+sp3 <- ggplot(df3, aes(Beta, Person)) 
+
+sp3 <- sp3 + geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, fill=Classification)) 
+
+sp3 <- sp3 + aes(x=Beta, xmin=Beta-1.96*se, xmax=Beta+1.96*se, y=Person, color=Genome) + geom_pointrange(aes(shape=Analysis), size = 1.5) 
+
+
+sp3 <- sp3 + facet_grid(rsid+gene~.,scales="free",space="free",labeller= label_parsed)
+
+sp3 <- sp3 + geom_vline(xintercept=0) # add 0 line
+
+sp3 <- sp3 + xlab("Effect Size") + ylab("") + scale_color_manual(values=c("#009E73","#D55E00","#0072B2")) + 
+  scale_x_continuous(breaks=seq(-0.2,0.4,0.1)) +
+  theme_bw() + geom_vline(xintercept = seq(-0.2,0.4,0.1), color ="gray73", linetype = "dashed") +
+  theme(text = element_text(face = "bold", size=36, color = "black")) +
+  theme(strip.text.y.right = element_text(angle=90, size=28, face="bold")) +
+  theme(axis.text.y.left = element_blank()) + 
+  theme(axis.ticks.y.left = element_blank()) +
+  scale_fill_manual(values = c("Unclassified" = "white")) +
+  theme(legend.key = element_rect(fill = "white", colour = "black")) +
+  guides(color = guide_legend(override.aes=list(fill = NA, linetype = 0, size=1)),
+         shape = guide_legend(override.aes = list(linetype = 0)), 
+         fill = "none") +
+  theme(strip.background = element_rect(fill = "white", color = "black")) +
+  theme(legend.key.size = unit(1.5, 'cm')) +
+  theme(legend.text = element_text(size=34)) +
+  labs(title = "Unclassified")
+
+## Combine plots
 
 sp2 <- sp2 + theme(legend.box = "horizontal")
 
@@ -253,23 +289,29 @@ leg <- as_ggplot(get_legend(sp2))
 
 sp1 <- sp1 + theme(legend.position="none")
 sp2 <- sp2 + theme(legend.position="none")
-
+sp3 <- sp3 + theme(legend.position="none")
 
 
 layout <- c(area(1,1),
-            area(2,1,8,1),
-            area(1,2,8,2)
+            area(3,1,6,1),
+            area(7,1,9,1),
+            area(1,2,9,2)
 )
 
-tf <- (leg/sp1) + sp2 + plot_layout(design=layout)
 
-png("Classification_Forest_plots/Plots/SuppFig_3B_Classifications of remaining Loci.png",
-    res=300, width=55, height=65, units="cm")
+tf <- (leg/sp1/sp2) + sp3 + plot_layout(design=layout)
+
+
+png("/placental_weight_code/Classification_Forest_Plots/Plots/SuppFig_3B_Classifications of remaining Loci.png",
+    res=600, width=55, height=65, units="cm")
 tf
 dev.off()
 
 
-
+figure_path <- file.path(here(), 'placental_weight_code/Classification_Forest_Plots/Plots/SuppFig_3B_Classifications.eps')
+postscript(figure_path, width = 20, height = 28, horizontal = FALSE, onefile = FALSE, paper = "special")
+tf
+dev.off()
 
 
 
