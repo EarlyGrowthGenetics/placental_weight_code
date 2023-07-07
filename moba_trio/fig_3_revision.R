@@ -1923,17 +1923,19 @@ kcnq1Plot <- ggplot() +
 
 # Gene coordinates
 
-geneCoordinatesDF <- data.frame(
-  name = c("KCNQ1", "KCNQ1OT1", "COX6CP18", "KCNQ1-AS1", "KCNQ1DN"),
-  start = c(2465914, 2629558, 2792586, 2861365,	2891263),
-  end = c(2870339, 2721224,	2792807, 2882798, 2893335)
-) %>% 
-  filter(
-    name %in% c("KCNQ1", "KCNQ1-AS1")
-  )
-
 regionBegin <- min(locusAnnotationDF$pos) - halfWindow
 regionEnd <- max(locusAnnotationDF$pos) + halfWindow
+
+minWidth <- (regionEnd - regionBegin)/40
+
+geneCoordinatesDF <- data.frame(
+  name = c("KCNQ1", "KCNQ1OT1", "COX6CP18", "KCNQ1-AS1", "KCNQ1DN", "CDKN1C"),
+  start = c(2465914, 2629558, 2792586, 2861365,	2891263, 2904443),
+  end = c(2870339, 2721224,	2792807, 2882798, 2893335, 2904443)
+) %>% 
+  filter(
+    name %in% c("KCNQ1", "KCNQ1-AS1", "CDKN1C")
+  )
 
 geneCoordinatesDF <- geneCoordinatesDF %>% 
   filter(
@@ -1943,8 +1945,6 @@ geneCoordinatesDF <- geneCoordinatesDF %>%
     start = ifelse(start < regionBegin, regionBegin, start),
     end = ifelse(end < regionBegin, regionBegin, end)
   )
-
-minWidth <- (regionEnd - regionBegin)/40
 
 geneCoordinatesPlotDF <- geneCoordinatesDF %>% 
   mutate(
@@ -1963,6 +1963,56 @@ geneCoordinatesPlotDF <- rbind(
       allele_transmission = "MT"
     ),
   geneCoordinatesPlotDF %>% 
+    mutate(
+      allele_transmission = "PT"
+    )
+)
+
+exonDF <- rbind(
+  data.frame(
+    name = "KCNQ1",
+    start = c(2466221, 2549158,	2591858,	2592555,	2593243,	2594076,	2604665,	2606442,	2608800,	2609943,	2683191,	2790074,	2797190,	2798216,	2799206,	2868997),
+    end = c(2466714,	2549248,	2591984,	2592633,	2593339,	2594216,	2604775,	2606537,	2608922,	2610084,	2683311,	2790149,	2797284,	2798262,	2799267,	2870339)
+  ),
+  data.frame(
+    name = "KCNQ1-AS1",
+    start = c(2882798,	2880169,	2861672),
+    end = c(2882220	,2879973,	2861365)
+  ),
+  data.frame(
+    name = "CDKN1C",
+    start = c(2907111,	2905364,	2905145),
+    end = c(2905900,	2905229,	2904443
+    )
+  )
+)
+
+exonDF <- exonDF %>% 
+  filter(
+    end > regionBegin & start < regionEnd
+  ) %>% 
+  mutate(
+    start = ifelse(start < regionBegin, regionBegin, start),
+    end = ifelse(end < regionBegin, regionBegin, end)
+  )
+
+exonPlotDF <- exonDF %>% 
+  mutate(
+    names_factor = factor(name, levels = geneCoordinatesDF$name),
+    y = (nrow(geneCoordinatesDF) - as.numeric(names_factor)) / nrow(geneCoordinatesDF) - 1,
+    end = ifelse(end - start < minWidth, start + minWidth, end)
+  )
+
+exonPlotDF <- rbind(
+  exonPlotDF %>% 
+    mutate(
+      allele_transmission = "MnT"
+    ),
+  exonPlotDF %>% 
+    mutate(
+      allele_transmission = "MT"
+    ),
+  exonPlotDF %>% 
     mutate(
       allele_transmission = "PT"
     )
@@ -2178,8 +2228,19 @@ kcnq1LzPlot <- ggplot() +
         col = "red3",
         size = 3
     ) +
-  geom_rect(
+  geom_segment(
     data = geneCoordinatesPlotDF,
+    mapping = aes(
+      x = start,
+      xend = end,
+      y = y,
+      yend = y
+    ),
+    col = "grey30",
+    size = 0.3
+  )  +
+  geom_rect(
+    data = exonPlotDF,
     mapping = aes(
       xmin = start,
       xmax = end,
@@ -2187,7 +2248,8 @@ kcnq1LzPlot <- ggplot() +
       ymax = y + 1/20
     ),
     col = "grey30",
-    fill = "grey90"
+    fill = "grey90",
+    size = 0.3
   ) +
   geom_richtext(
     data = geneCoordinatesPlotDF,
@@ -2437,8 +2499,19 @@ bwLzPlot <- ggplot() +
         col = "red3",
         size = 3
     ) +
-  geom_rect(
+  geom_segment(
     data = geneCoordinatesPlotDF,
+    mapping = aes(
+      x = start,
+      xend = end,
+      y = y,
+      yend = y
+    ),
+    col = "grey30",
+    size = 0.3
+  )  +
+  geom_rect(
+    data = exonPlotDF,
     mapping = aes(
       xmin = start,
       xmax = end,
@@ -2446,7 +2519,8 @@ bwLzPlot <- ggplot() +
       ymax = y + 1/20
     ),
     col = "grey30",
-    fill = "grey90"
+    fill = "grey90",
+    size = 0.3
   ) +
   geom_richtext(
     data = geneCoordinatesPlotDF,
@@ -2511,7 +2585,7 @@ pdf(
     height = unit(24.7 / 3, "cm"), 
     pointsize = 12
 )
-(heatMap | ((kcnq1Plot / ((kcnq1LzPlot / bwLzPlot) + plot_layout(guides = "collect") & theme(legend.position = 'top')))) + plot_layout(heights = c(0.8, 2.2))) + 
+(heatMap | ((kcnq1Plot / ((kcnq1LzPlot / bwLzPlot) + plot_layout(guides = "collect") & theme(legend.position = 'top')))) + plot_layout(heights = c(0.7, 2.3))) + 
     plot_layout(
         widths = c(2, 1.2),
         guides = "keep"
