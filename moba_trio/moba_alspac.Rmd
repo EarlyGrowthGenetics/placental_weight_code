@@ -1,0 +1,240 @@
+---
+title: "moba_alspac"
+author: "Marc Vaudel"
+date: "1 9 2021"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# MoBa - Alspac haplotype analysis
+
+## Libraries
+
+```{r }
+
+library(tidyr)
+library(dplyr)
+library(janitor)
+library(glue)
+library(conflicted)
+library(scico)
+library(ggplot2)
+library(grid)
+
+conflict_prefer("filter", "dplyr")
+conflict_prefer("select", "dplyr")
+
+theme_set(theme_bw(base_size = 16))
+
+```
+
+## Load data from MoBa
+
+```{r }
+
+targetsDF <- read.table(
+    file = "../../resources/targets/targets_pw",
+    header = T,
+    sep = "\t",
+    stringsAsFactors = F
+) %>% 
+    clean_names()
+
+mobaDF <- read.table(
+    file = "../../docs/results/pw/targets_pw_z_placenta_weight.lm.gz",
+    header = T,
+    sep = "\t",
+    stringsAsFactors = F
+) %>% 
+    clean_names()
+
+# ids <- unique(c(paste0(mobaDF$contig, ":", mobaDF$position, ":", mobaDF$tested_allele, ":", mobaDF$other_allele), paste0(mobaDF$contig, ":", mobaDF$position, ":", mobaDF$other_allele, ":", mobaDF$tested_allele)))
+# 
+# alspacDF <- read.table(
+#     file = "C:\\Projects\\placenta_weight\\ge_hap\\ALSPAC.plwt.hap.gwas.result.csv.gz",
+#     header = T,
+#     sep = ",",
+#     stringsAsFactors = F
+# ) %>% 
+#     clean_names()
+# 
+# alspacTargetDF <- alspacDF %>% 
+#     filter(
+#         snp %in% ids
+#     )
+# 
+# write.table(
+#     x = alspacTargetDF,
+#     file = gzfile("../../docs/results/pw/targets_pw_alspac_ge.lm.gz"),
+#     row.names = F,
+#     col.names = T,
+#     sep = "\t",
+#     quote = F
+# )
+
+alspacTargetDF <- read.table(
+    file = "../../docs/results/pw/targets_pw_alspac_ge.lm.gz",
+    header = T,
+    sep = "\t",
+    stringsAsFactors = F
+) %>% 
+    clean_names()
+
+```
+
+
+# Compare association results
+
+Comment from Ge:
+
+> h1, h2, and h3 correspond to marternal transmitted, non-transmitted and parternal transmitted alleles.
+> H2, H3, H4 and H5 are linear hypothesis tests for  ('h1-h3+h2', 'h1-h2+h3', 'h1-h2-h3', and 'h1+h3') respectively.  i.e. materna effect:H2, paternal effect:H3, POE:H4. and unadjusted fetal effect: H5.
+
+```{r }
+
+docsFile <- "haplotypes.md"
+figuresFolder <- "fig"
+
+write(
+    x = "# Haplotypes",
+    file = docsFile,
+    append = F
+)
+
+mobaDF <- mobaDF %>% 
+    arrange(
+        cmf_cmf_mt_p
+    )
+
+for (i in 1:nrow(mobaDF)) {
+    
+    rsid <- mobaDF$rs_id[i]
+    locus <- targetsDF$comment[which(targetsDF$snp == rsid)]
+    alspacId <- paste0(mobaDF$contig[i], ":", mobaDF$position[i], ":", mobaDF$tested_allele[i], ":", mobaDF$other_allele[i])
+    
+    if (!alspacId %in% alspacTargetDF$snp) {
+        
+        alspacId <- paste0(mobaDF$contig[i], ":", mobaDF$position[i], ":", mobaDF$other_allele[i], ":", mobaDF$tested_allele[i])
+        
+    }
+    
+    aslpacI <- which(alspacTargetDF$snp == alspacId)
+    
+    write(
+        x = glue("## {locus} ({rsid})"),
+        file = docsFile,
+        append = T
+    )
+    
+    if (length(aslpacI) == 1) {
+        
+        sign <- 1
+        
+        if (alspacTargetDF$alt[aslpacI] != mobaDF$tested_allele[i]) {
+            
+            sign <- -1
+            
+        }
+        
+        hDF <- data.frame(
+            beta = c(mobaDF$h_bmnt[i], sign * alspacTargetDF$h2_coef[aslpacI]/130, mobaDF$h_bmt[i], sign * alspacTargetDF$h1_coef[aslpacI]/130, mobaDF$h_bft[i], sign * alspacTargetDF$h3_coef[aslpacI]/130, mobaDF$h_bfnt[i]),
+            se = c(mobaDF$h_bmnt_se[i], alspacTargetDF$h2_se[aslpacI]/130, mobaDF$h_bmt_se[i], alspacTargetDF$h1_se[aslpacI]/130, mobaDF$h_bft_se[i], alspacTargetDF$h3_se[aslpacI]/130, mobaDF$h_bfnt_se[i]),
+            p = c(mobaDF$h_bmnt_p[i], alspacTargetDF$h2_pval[aslpacI], mobaDF$h_bmt_p[i], alspacTargetDF$h1_pval[aslpacI], mobaDF$h_bft_p[i], alspacTargetDF$h3_pval[aslpacI], mobaDF$h_bfnt_p[i]),
+            variable = c("MnT", "MnT", "MT", "MT", "FT", "FT", "FnT"),
+            cohort = c("MoBa", "Alspac", "MoBa", "Alspac", "MoBa", "Alspac", "MoBa"),
+            stringsAsFactors = F
+        )
+        
+    } else {
+        
+        hDF <- data.frame(
+            beta = c(mobaDF$h_bmnt[i], mobaDF$h_bmt[i], mobaDF$h_bft[i], mobaDF$h_bfnt[i]),
+            se = c(mobaDF$h_bmnt_se[i], mobaDF$h_bmt_se[i], mobaDF$h_bft_se[i], mobaDF$h_bfnt_se[i]),
+            p = c(mobaDF$h_bmnt_p[i], mobaDF$h_bmt_p[i], mobaDF$h_bft_p[i], mobaDF$h_bfnt_p[i]),
+            variable = c("MnT", "MT", "FT", "FnT"),
+            cohort = c("MoBa", "MoBa", "MoBa", "MoBa"),
+            stringsAsFactors = F
+        )
+        
+    }
+    
+    hDF$variableFactor <- factor(hDF$variable, levels = c("MnT", "MT", "FT", "FnT"))
+    hDF$cohortFactor <- factor(hDF$cohort, levels = c("MoBa", "Alspac"))
+    
+    hDF$x <- ifelse(hDF$variable != "FnT", as.numeric(hDF$variableFactor) + (as.numeric(hDF$cohortFactor) - 1.5)/10, as.numeric(hDF$variableFactor))
+    
+    hPlot <- ggplot() +
+        geom_hline(
+            data = hDF,
+            mapping = aes(
+                yintercept = 0
+            )
+        ) +
+        geom_segment(
+            data = hDF,
+            mapping = aes(
+                x = x,
+                xend = x,
+                y = beta - 1.96 * se,
+                yend = beta + 1.96 * se,
+                col = cohortFactor
+            )
+        ) +
+        geom_point(
+            data = hDF,
+            mapping = aes(
+                x = x,
+                y = beta,
+                col = cohortFactor
+            )
+        ) +
+        scale_x_continuous(
+            breaks = 1:4,
+            labels = c("MnT", "MT", "FT", "FnT")
+        ) +
+        scale_y_continuous(
+            name = "Beta ± 95%"
+        ) +
+        scale_color_manual(
+            values = scico(
+                n = 2,
+                begin = 0.2,
+                end = 0.8,
+                palette = "cork"
+            )
+        ) +
+        theme(
+            legend.title = element_blank(),
+            legend.position = "top",
+            axis.title.x = element_blank(),
+            panel.grid.major.x = element_blank(),
+            panel.grid.minor.x = element_blank(),
+            panel.border = element_blank()
+        )
+    
+    fileName <- glue("{figuresFolder}/{rsid}.png")
+    
+    png(
+        filename = fileName,
+        width = 800,
+        height = 600
+    )
+    grid.draw(hPlot)
+    dummy <- dev.off()
+    
+    write(
+        x = glue("![{rsid}]({fileName})"),
+        file = docsFile,
+        append = T
+    )
+    
+}
+
+
+```
+
+
+
