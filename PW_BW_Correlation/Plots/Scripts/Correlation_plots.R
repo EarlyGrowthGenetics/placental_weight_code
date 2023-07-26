@@ -8,7 +8,7 @@ library(patchwork)
 library(grid)
 
 df <- fread(
-  file = file.path(here(), 'PW_BW_Correlation/Plots/Scripts/resources/combined_results.csv.gz'),
+  file = file.path(here(), 'placental_weight_code/PW_BW_Correlation/Plots/Scripts/resources/combined_results.csv.gz'),
   header = T,
   sep = ","
 )
@@ -123,7 +123,8 @@ fp1 <- fp1 + theme(plot.title =
                       axis.text.x = element_text(face = "bold", color="black", size = 14), 
                       axis.ticks.x = element_blank(),
                       axis.text.y = element_text(face = "bold", color = "black", size = 14),
-                      axis.title.y = element_text(face = "bold", size = 14))
+                      axis.title.y = element_text(face = "bold", size = 14),
+                      axis.ticks.y = element_blank())
 
 fp2 <- fp1 + guides(fill="none") 
 
@@ -131,12 +132,14 @@ fp2 <- fp2 + theme(legend.text=element_text(size=16),
                    legend.title=element_text(size=16)) +
              theme(axis.title.y = element_text(size = 16, face="bold")) 
 
-figure_path <- file.path(here(), 'PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.png')
+fp2 <- fp2 + theme(panel.border=element_blank())
+
+figure_path <- file.path(here(), 'placental_weight_code/PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.png')
 png(figure_path, width = 900, height = 500)
 fp2
 dev.off()
 
-figure_path <- file.path(here(), 'PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.eps')
+figure_path <- file.path(here(), 'placental_weight_code/PW_BW_Correlation/Plots/Fig_4_pwt_bwt_correlation.eps')
 postscript(figure_path, width = 13, height = 13, horizontal = FALSE, onefile = FALSE, paper = "special")
 grid.draw(fp2)
 dev.off()
