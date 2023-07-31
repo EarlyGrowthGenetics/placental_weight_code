@@ -119,6 +119,7 @@ forest_plot <- forest_plot +
     legend.text=element_text(face = "bold", size=24)
   )
 
+forest_plot <- forest_plot + theme(panel.border = element_blank()) + theme(axis.ticks.y = element_blank())
 
 # save the plot
 
