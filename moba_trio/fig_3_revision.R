@@ -1923,6 +1923,17 @@ kcnq1Plot <- ggplot() +
 
 # Gene coordinates
 
+lzMaxP <- 7
+halfWindow <- 150000
+ldColors <- brewer.pal(9, "Set1")[c(9, 2, 3, 5, 1)]
+
+locusAnnotationDF <- data.frame(
+  name = c("Placental Weight", "Birth Weight"),
+  id = c("rs2237892", "rs234864"),
+  pos = c(2839751, 2857297),
+  stringsAsFactors = F
+)
+
 regionBegin <- min(locusAnnotationDF$pos) - halfWindow
 regionEnd <- max(locusAnnotationDF$pos) + halfWindow
 
@@ -2019,20 +2030,6 @@ exonPlotDF <- rbind(
 )
 
 # Locus Zoom KCNQ1 PW
-
-lzMaxP <- 7
-halfWindow <- 150000
-ldColors <- brewer.pal(9, "Set1")[c(9, 2, 3, 5, 1)]
-
-locusAnnotationDF <- data.frame(
-    name = c("Placental Weight", "Birth Weight"),
-    id = c("rs2237892", "rs234864"),
-    pos = c(2839751, 2857297),
-    stringsAsFactors = F
-)
-
-regionBegin <- min(locusAnnotationDF$pos) - halfWindow
-regionEnd <- max(locusAnnotationDF$pos) + halfWindow
 
 recombinationRatesDF <- read.table(
     file = glue("{here()}/moba_trio/resources/genetic_map_GRCh37_chr11.txt.gz"),
@@ -2144,8 +2141,13 @@ labelPwDF <- locusAnnotationDF %>%
         hjust = case_when(
             id == "rs2237892" ~ 1,
             id == "rs234864" ~ 0
+        ),
+        label = case_when(
+          id == "rs2237892" ~ "rs2237892 (PW)",
+          id == "rs234864" ~ "rs234864 (BW)"
         )
-    )
+    ) %>% 
+  distinct()
 
 
 kcnq1LzPlot <- ggplot() +
@@ -2174,7 +2176,7 @@ kcnq1LzPlot <- ggplot() +
             x = position + dx,
             y = y,
             nudge_x = dx,
-            label = name,
+            label = label,
             hjust = hjust
         ),
         vjust = 0.5,
@@ -2279,7 +2281,7 @@ kcnq1LzPlot <- ggplot() +
         labels = glue("{round((regionBegin + halfWindow)/1000000, 2)} Mb")
     ) + 
     scale_y_continuous(
-        name = "Placental Weight [MoBa]",
+        name = "PW MoBa [-log10(P)]",
         limits = c(-1.05, lzMaxP),
         expand = c(0, 0)
     ) +
@@ -2415,8 +2417,13 @@ labelBwDF <- locusAnnotationDF %>%
         hjust = case_when(
             id == "rs2237892" ~ 1,
             id == "rs234864" ~ 0
+        ),
+        label = case_when(
+          id == "rs2237892" ~ "rs2237892 (PW)",
+          id == "rs234864" ~ "rs234864 (BW)"
         )
-    )
+    ) %>% 
+  distinct()
 
 
 bwLzPlot <- ggplot() +
@@ -2445,7 +2452,7 @@ bwLzPlot <- ggplot() +
             x = position + dx,
             y = y,
             nudge_x = dx,
-            label = name,
+            label = label,
             hjust = hjust
         ),
         vjust = 0.5,
@@ -2550,7 +2557,7 @@ bwLzPlot <- ggplot() +
         labels = glue("{round((regionBegin + halfWindow)/1000000, 2)} Mb")
     ) + 
     scale_y_continuous(
-        name = "Birth Weight [MoBa]",
+        name = "BW MoBa [-log10(P)]",
         limits = c(-1.05, lzMaxP),
         expand = c(0, 0)
     ) +
@@ -2580,7 +2587,7 @@ bwLzPlot <- ggplot() +
 
 
 pdf(
-    file = glue("{here()}/moba_trio/figures//fig_3_mode_of_association_06_07_23_{fill_variable}_scaled.pdf"),
+    file = glue("{here()}/moba_trio/figures//fig_3_mode_of_association_31_07_23_{fill_variable}_scaled.pdf"),
     width = unit(12, "cm"),
     height = unit(24.7 / 3, "cm"), 
     pointsize = 12
