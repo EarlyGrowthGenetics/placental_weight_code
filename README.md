@@ -15,6 +15,7 @@ This manuscript contains code and resources used in the GWAS of placental weight
 - [Mode of association](moba_trio/README.md): Mode of association analysis in trios from MoBa
 - [Parity analysis](parity/README.md): Analysis of the link between placental weight and parity
 - [Mendelian Randomization](MR_analyses/README.md): Mendelian Randomziation analyses
+- [meQTL analysis](mQTL_analysis/README.md): meQTL analysis
 
 
 #### Code of Conduct
